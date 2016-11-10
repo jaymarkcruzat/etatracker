@@ -891,14 +891,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Marker peerMarker = (Marker) connectedUsersMarkers.get(userName);
                         connectedUsersMarkers.remove(userName);
                         peerMarker.remove();
-                        Marker newPeerMarker = googleMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)));
-                        newPeerMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.peer));
+                        Marker newPeerMarker = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.peer)).position(new LatLng(latitude, longitude)));
                         newPeerMarker.setDraggable(false);
                         connectedUsersMarkers.put(userName, newPeerMarker);
                         updateUserPanel(userName, Integer.parseInt(userCode), latitude, longitude, speed, eta, timeStamp, targetLocation);
                     } else {
-                        Marker newPeerMarker = googleMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)));
-                        newPeerMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.peer));
+                        Marker newPeerMarker = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.peer)).position(new LatLng(latitude, longitude)));
                         newPeerMarker.setDraggable(false);
                         connectedUsersMarkers.put(userName, newPeerMarker);
                         updateUserPanel(userName, Integer.parseInt(userCode), latitude, longitude, speed, eta, timeStamp, targetLocation);
