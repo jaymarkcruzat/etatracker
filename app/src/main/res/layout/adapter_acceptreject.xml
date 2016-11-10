@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/listview_layout"
+    android:orientation="vertical"
+    >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:paddingLeft="5dp"
+                android:paddingTop="@dimen/nav_header_vertical_spacing"
+                android:src="@drawable/profile" />
+            <TextView
+                android:id="@+id/userItem"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+
+            <ProgressBar
+                android:id="@+id/user_directory_progress"
+                style="?android:attr/progressBarStyleInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"/>
+            <Button
+                android:id="@+id/acceptButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/app_primary"
+                android:textColor="@color/white"
+                android:text="ACCEPT"
+                android:textSize="12sp"
+                android:layout_marginRight="5dp"
+                android:onClick="acceptRequest"/>
+            <Button
+                android:id="@+id/rejectButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/app_primary"
+                android:textColor="@color/white"
+                android:text="REJECT"
+                android:textSize="12sp"
+                android:layout_marginRight="5dp"
+                android:onClick="rejectRequest"/>
+        </LinearLayout>
+</LinearLayout>

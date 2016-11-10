@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/lightblue"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <TextView
+        android:id="@+id/status_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/progress_searchinggpssignal"
+        android:textColor="@color/message"
+        android:background="@color/lightblue"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:freezesText="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:textAlignment="center"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <fragment
+        android:id="@+id/gmap"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        />
+
+    <ImageView
+        android:id="@+id/crosshair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/selector"
+        android:layout_gravity="center_vertical"
+        android:layout_centerInParent="true"/>
+
+    <include layout="@layout/user_panel" />
+
+
+</RelativeLayout>

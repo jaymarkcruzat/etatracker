@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fab_label" type="id"/>
+    <item name="horizontal_panel_id" type="id"/>
+    <item name="user_panel_button_id" type="id"/>
+    <item name="user_panel_text_id" type="id"/>
+</resources>

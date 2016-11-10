@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <sp.ics.uplb.gtrack.menus.fab.FloatingActionMenu
+        android:id="@+id/faMenu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true"
+        fab:menu_backgroundColor="#ccffffff">
+
+        <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
+            android:id="@+id/createMarker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/create_marker"
+            fab:fab_size="mini"
+            fab:fab_label="Create Marker" />
+
+        <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
+            android:id="@+id/sendRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/send_request"
+            fab:fab_size="mini"
+            fab:fab_label="Send Request" />
+
+        <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
+            android:id="@+id/acceptRejectRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/incoming_requests"
+            fab:fab_size="mini"
+            fab:fab_label="Incoming Requests" />
+
+        <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
+            android:id="@+id/usersDirectory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/contacts"
+            fab:fab_size="mini"
+            fab:fab_label="Contact List" />
+
+    </sp.ics.uplb.gtrack.menus.fab.FloatingActionMenu>
+
+</RelativeLayout>

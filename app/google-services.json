@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "838769153083",
+    "firebase_url": "https://android-projects-1295.firebaseio.com",
+    "project_id": "android-projects-1295",
+    "storage_bucket": "android-projects-1295.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838769153083:android:ecf5263910f5714e",
+        "android_client_info": {
+          "package_name": "sp.ics.uplb.gtrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838769153083-br7ucvic79ttbebjdbb1ge1e7595m4vd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmb56UQLLX8I8AE9Vxb32f2VZvZUlKK_w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
