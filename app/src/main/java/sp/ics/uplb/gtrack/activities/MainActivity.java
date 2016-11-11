@@ -189,12 +189,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (!isServiceActive(FirebaseListenerService.class)) {
             String target = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
+            String targetLatitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, null);
+            String targetLongitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, null);
             Intent intent = new Intent(getApplicationContext(), FirebaseListenerService.class);
             intent.putExtra(Constants.USER_EMAIL, emailAddress);
             intent.putExtra(Constants.USER_NAME, userName);
             intent.putExtra(Constants.USER_CODE, userCode);
             intent.putExtra(Constants.USER_FIREBASEID, firebaseid);
             intent.putExtra(Constants.TARGET_LOCATION, target);
+            intent.putExtra(Constants.TARGET_LOCATION_LATITUDE, targetLatitude);
+            intent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, targetLongitude);
             startService(intent);
         }
 

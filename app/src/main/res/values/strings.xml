@@ -120,6 +120,7 @@
     <string name="message_meeting_request_accepted">You accepted meeting request by</string>
     <string name="message_meeting_request_rejected">You rejected meeting request by</string>
     <string name="message_user_is_now_disconnected">You are now disconnected to</string>
+    <string name="message_target_reached">You have successfully reached the target point.</string>
 
     <string name="prompt_email">Username</string>
     <string name="prompt_username">Username</string>

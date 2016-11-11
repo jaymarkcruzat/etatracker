@@ -28,12 +28,15 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CONTACTS_CONNECTED_TABLE);
         String CREATE_CONTACTS_LIST_TABLE = "CREATE TABLE " + Constants.TABLE_CONTACTS_LIST + "(" + Constants.KEY_ID + " INTEGER PRIMARY KEY," + Constants.KEY_NAME + " TEXT," + Constants.KEY_FIREBASEID + " TEXT" + ")";
         db.execSQL(CREATE_CONTACTS_LIST_TABLE);
+        String CREATE_NODE_TABLE = "CREATE TABLE " + Constants.TABLE_NODE + "(" + Constants.KEY_ID + " INTEGER PRIMARY KEY," + Constants.KEY_NODE_LATITUDE + " DOUBLE," + Constants.KEY_NODE_LONGITUDE + " DOUBLE," + Constants.KEY_NODE_DEST_LATITUDE + " DOUBLE," + Constants.KEY_NODE_DEST_LONGITUDE + " DOUBLE," +Constants.KEY_NODE_NEXT + " INTEGER" + ")";
+        db.execSQL(CREATE_NODE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CONTACTS_CONNECTED);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_CONTACTS_LIST);
+        db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NODE);
         onCreate(db);
     }
 
@@ -183,6 +186,31 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(Constants.TABLE_CONTACTS_LIST, Constants.KEY_ID + " = ?", new String[]{String.valueOf(contact.getID())});
         db.close();
+    }
+
+    //NODE
+
+    public void addNode(Node node) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Constants.KEY_NODE_LATITUDE, node.getLatitude());
+        values.put(Constants.KEY_NODE_LONGITUDE, node.getLongitude());
+        values.put(Constants.KEY_NODE_DEST_LATITUDE, node.getDestLatitude());
+        values.put(Constants.KEY_NODE_DEST_LONGITUDE, node.getDestLongitude());
+        values.put(Constants.KEY_NODE_NEXT, node.getNodeNext());
+        db.insert(Constants.TABLE_NODE, null, values);
+        db.close();
+    }
+
+    public boolean isNodeExists(double latitude,double longitude,double dest_latitude,double dest_longitude) {
+        String selectQuery = "SELECT  * FROM " + Constants.TABLE_NODE + " WHERE " + Constants.KEY_NODE_LATITUDE + "=" + latitude +" AND "+Constants.KEY_NODE_LONGITUDE + "=" +longitude +" AND "+Constants.KEY_NODE_DEST_LATITUDE + "=" +dest_latitude+" AND "+Constants.KEY_NODE_DEST_LONGITUDE + "=" +dest_longitude;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.getCount()<=0) {
+            cursor.close();
+            return false;
+        }
+        return true;
     }
 
 }

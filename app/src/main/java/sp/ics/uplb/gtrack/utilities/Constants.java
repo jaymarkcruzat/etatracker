@@ -4,7 +4,9 @@ public class Constants {
 
     public static final String DEFAULT_ZOOM                                 = "15";
     public static final int FIREBASE_PRIORITY_HIGH                          = 9999;
-    public static final long LOCATION_REQUEST_INTERVAL                      = 10000;
+    public static final int END_ROUTE                                       = -1;
+    public static final long LOCATION_REQUEST_INTERVAL                      = 5000;
+    public static final long MIN_DISTANCE_TO_REACH_TARGET                   = 1;
 
     public static final String INTENT_DRAW_GPS                              = "sp.ics.uplb.gtrack.DRAW_GPS_INTENT";
     public static final String INTENT_DISCONNECT                            = "sp.ics.uplb.gtrack.DISCONNECT";
@@ -37,6 +39,8 @@ public class Constants {
     public static final String USER_CODE                                    = "user_code";
     public static final String USER_FIREBASEID                              = "user_firebaseid";
     public static final String TARGET_LOCATION                              = "target_location";
+    public static final String TARGET_LOCATION_LATITUDE                     = "target_location_latitude";
+    public static final String TARGET_LOCATION_LONGITUDE                    = "target_location_longitude";
     public static final String DISCONNECT                                   = "disconnect";
 
     public static final String STATUS_MESSAGE                               = "message";
@@ -67,6 +71,7 @@ public class Constants {
     public static final String KEY_RELEASE_GPS_RECEIVER_LOCK                = "release_gps_receiver_lock";
     public static final String KEY_FBASE_SERVER_TIMESTAMP                   = "fbase_server_timestamp";
     public static final String KEY_TARGET_LOCATION                          = "target_location";
+    public static final String KEY_LOG_MESSAGE                              = "log_message";
 
     public static final String HTTP_POST_USERNAME                           = "username";
     public static final String HTTP_POST_PASSWORD                           = "password";
@@ -128,17 +133,14 @@ public class Constants {
     public static final String DATABASE_NAME                                = "ApplicationDB";
     public static final String TABLE_CONTACTS_CONNECTED                     = "contacts_connected";
     public static final String TABLE_CONTACTS_LIST                          = "contacts_list";
-    public static final String TABLE_MEETING_LOCATIONS                      = "meeting_locations";
-    public static final String TABLE_TARGET_LOCATION                        = "target_location";
+    public static final String TABLE_NODE                                   = "node";
+
     public static final String KEY_ID                                       = "id";
     public static final String KEY_NAME                                     = "name";
     public static final String KEY_FIREBASEID                               = "firebaseid";
-    public static final String KEY_MKR_ID                                   = "marker_id";
-    public static final String KEY_MKR_NAME                                 = "marker_name";
-    public static final String KEY_MKR_DESC                                 = "marker_desc";
-    public static final String KEY_MKR_LATITUDE                             = "marker_latitude";
-    public static final String KEY_MKR_LONGITUDE                            = "marker_longitude";
-
-    public static final String KEY_TGL_ID                                   = "tgl_id";
-    public static final String KEY_TGL_NAME                                 = "tgl_name";
+    public static final String KEY_NODE_LATITUDE                            = "node_latitude";
+    public static final String KEY_NODE_LONGITUDE                           = "node_longitude";
+    public static final String KEY_NODE_DEST_LATITUDE                       = "node_dest_latitude";
+    public static final String KEY_NODE_DEST_LONGITUDE                      = "node_dest_longitude";
+    public static final String KEY_NODE_NEXT                                = "node_next";
 }

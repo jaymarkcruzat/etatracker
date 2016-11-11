@@ -37,6 +37,14 @@ import sp.ics.uplb.gtrack.R;
 
 public class Common {
 
+    public static boolean isNull(String str) {
+        if (str==null) return true;
+        else {
+            if (str.length()==0) return true;
+            else return false;
+        }
+    }
+
     public static void delayInSeconds(long secs) {
         try {
             Thread.sleep(secs * 1000);

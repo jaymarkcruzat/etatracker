@@ -197,14 +197,19 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             }
                                             mainActivity.markerButtonSet.setText(mainActivity.markerButtonSet.getText().equals(Constants.BUTTON_TEXT_SET) ? Constants.BUTTON_TEXT_UNSET : Constants.BUTTON_TEXT_SET);
                                             String target = SharedPref.getString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
-                                            mainActivity.selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(target==null||!target.equals(title) ? R.drawable.target_marker : R.drawable.marker));
+                                            mainActivity.selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(target == null || !target.equals(title) ? R.drawable.target_marker : R.drawable.marker));
                                             SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, target == null || !target.equals(title) ? title : null);
+                                            SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().latitude) : null);
+                                            SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().longitude) : null);
                                             Intent intent = new Intent(mainActivity.getApplicationContext(), FirebaseListenerService.class);
                                             intent.putExtra(Constants.USER_EMAIL, mainActivity.emailAddress);
                                             intent.putExtra(Constants.USER_NAME, mainActivity.userName);
                                             intent.putExtra(Constants.USER_CODE, mainActivity.userCode);
                                             intent.putExtra(Constants.USER_FIREBASEID, mainActivity.firebaseid);
                                             intent.putExtra(Constants.TARGET_LOCATION, target == null || !target.equals(title) ? title : null);
+                                            intent.putExtra(Constants.TARGET_LOCATION_LATITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().latitude) : null);
+                                            intent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().longitude) : null);
+
                                             mainActivity.startService(intent);
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(target == null || !target.equals(title) ? R.string.message_meeting_point_set : R.string.message_meeting_point_unset));
                                         } else if (status.contains(Constants.STATUS_ERROR))
