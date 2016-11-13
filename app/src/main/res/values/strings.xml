@@ -17,10 +17,11 @@
 
     <!-- server credentials -->
     <string name="server_protocol">http://</string>
-    <string name="server_ip">192.168.8.102</string>
-    <string name="server_dbuser">appdbadmin</string>
-    <string name="server_dbname">appdb</string>
-    <string name="server_dbpassword">h3ll0@ndr01d</string>
+    <string name="server_ip">45.79.10.86</string>
+    <string name="server_localhost">127.0.0.1</string>
+    <string name="server_dbuser">root</string>
+    <string name="server_dbname">APP_DB</string>
+    <string name="server_dbpassword">asdf</string>
 
     <!-- a key string for password encryption -->
     <string name="encrypt_key_spec">Time is the most precious resource</string>
@@ -70,7 +71,7 @@
     <string name="error_server_down">Server is under maintenance. Pls try again later.</string>
     <string name="error_update_failed">Database update failed.</string>
     <string name="error_network_unreachable">Network is unreachable. Pls check your Internet connection.</string>
-    <string name="error_system_admin">Internal System Error. Developer has been automatically notified.</string>
+    <string name="error_system_admin">Internal System Error.</string>
     <string name="error_insert_failed">Database insert failed.</string>
     <string name="error_delete_failed">Database delete failed.</string>
     <string name="error_select_failed">Database select failed.</string>

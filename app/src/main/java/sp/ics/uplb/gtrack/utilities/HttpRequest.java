@@ -25,6 +25,7 @@ public class HttpRequest {
         OutputStreamWriter wr = null;
         BufferedReader reader = null;
         InputStream inputStream = null;
+        Logger.print("link="+link+" data="+data);
         try {
             url = new URL(link);
         } catch (MalformedURLException ex) {}
@@ -90,6 +91,7 @@ public class HttpRequest {
             }
             try {
                 String response = sb.toString();
+                Logger.print("real_response:"+response);
                 if (response.length()>0 && response.charAt(0)!='{') {
                     if (response.contains("{\"code")) {
                         response = response.substring(response.indexOf("{\"code"));

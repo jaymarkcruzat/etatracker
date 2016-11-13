@@ -19,7 +19,7 @@ public class DBFunctions {
         while (status==null || (!status.equals(Constants.MESSAGE_SELECT_SUCCESSFUL) && status.equals(Constants.ERROR_NETWORK_UNREACHABLE) && (++iter <= MAX_ITERATION))) {
             link=context.getString(R.string.server_protocol) + context.getString(R.string.server_ip) + "/" + context.getString(R.string.app_name) + "/" + context.getString(R.string.php_select);
             try {
-                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_ip), context.getString(R.string.encrypt_encoding)) +"&"+
+                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_localhost), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBUSER, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbuser), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBNAME, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbname), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBPASSWORD, context.getString(R.string.encrypt_encoding))   + "=" + URLEncoder.encode(context.getString(R.string.server_dbpassword), context.getString(R.string.encrypt_encoding)) +"&"+
@@ -47,7 +47,7 @@ public class DBFunctions {
         while (status==null || (!status.equals(Constants.MESSAGE_INSERT_SUCCESSFUL) && status.equals(Constants.ERROR_NETWORK_UNREACHABLE) && (++iter <= MAX_ITERATION))) {
             link=context.getString(R.string.server_protocol) + context.getString(R.string.server_ip) + "/" + context.getString(R.string.app_name) + "/" + context.getString(R.string.php_insert);
             try {
-                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_ip), context.getString(R.string.encrypt_encoding)) +"&"+
+                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_localhost), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBUSER, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbuser), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBNAME, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbname), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBPASSWORD, context.getString(R.string.encrypt_encoding))   + "=" + URLEncoder.encode(context.getString(R.string.server_dbpassword), context.getString(R.string.encrypt_encoding)) +"&"+
@@ -75,7 +75,7 @@ public class DBFunctions {
         while (status==null || (!status.equals(Constants.MESSAGE_UPDATE_SUCCESSFUL) && status.equals(Constants.ERROR_NETWORK_UNREACHABLE) && (++iter <= MAX_ITERATION))) {
             link=context.getString(R.string.server_protocol) + context.getString(R.string.server_ip) + "/" + context.getString(R.string.app_name) + "/" + context.getString(R.string.php_update);
             try {
-                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_ip), context.getString(R.string.encrypt_encoding)) +"&"+
+                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_localhost), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBUSER, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbuser), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBNAME, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbname), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBPASSWORD, context.getString(R.string.encrypt_encoding))   + "=" + URLEncoder.encode(context.getString(R.string.server_dbpassword), context.getString(R.string.encrypt_encoding)) +"&"+
@@ -103,7 +103,7 @@ public class DBFunctions {
         while (status==null || (!status.equals(Constants.MESSAGE_DELETE_SUCCESSFUL) && status.equals(Constants.ERROR_NETWORK_UNREACHABLE) && (++iter <= MAX_ITERATION))) {
             link=context.getString(R.string.server_protocol) + context.getString(R.string.server_ip) + "/" + context.getString(R.string.app_name) + "/" + context.getString(R.string.php_delete);
             try {
-                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_ip), context.getString(R.string.encrypt_encoding)) +"&"+
+                data =  URLEncoder.encode(Constants.HTTP_POST_DBHOST, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_localhost), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBUSER, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbuser), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBNAME, context.getString(R.string.encrypt_encoding))       + "=" + URLEncoder.encode(context.getString(R.string.server_dbname), context.getString(R.string.encrypt_encoding)) +"&"+
                         URLEncoder.encode(Constants.HTTP_POST_DBPASSWORD, context.getString(R.string.encrypt_encoding))   + "=" + URLEncoder.encode(context.getString(R.string.server_dbpassword), context.getString(R.string.encrypt_encoding)) +"&"+
