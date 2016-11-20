@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sp.ics.uplb.gtrack.R;
+import sp.ics.uplb.gtrack.utilities.Logger;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class FloatingActionMenu extends ViewGroup {
@@ -470,6 +471,7 @@ public class FloatingActionMenu extends ViewGroup {
                 mMenuButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Logger.print("mMenuButton clicked!");
                         toggle(mIsAnimated);
                     }
                 });

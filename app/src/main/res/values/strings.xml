@@ -14,6 +14,10 @@
     <string name="label_notify_sender">Sender:</string>
     <string name="label_notify_location_service_running">Location Monitoring Service is Active</string>
     <string name="label_select_users_to_share">Username</string>
+    <string name="label_contacts">Contacts</string>
+    <string name="label_incoming_requests">Incoming Requests</string>
+    <string name="label_send_request">Send Request</string>
+    <string name="label_create_marker">Create Marker</string>
 
     <!-- server credentials -->
     <string name="server_protocol">http://</string>
@@ -24,7 +28,7 @@
     <string name="server_dbpassword">asdf</string>
 
     <!-- a key string for password encryption -->
-    <string name="encrypt_key_spec">Time is the most precious resource</string>
+    <string name="encrypt_key_spec">This is a random text.</string>
     <string name="encrypt_encoding">UTF-8</string>
     <string name="encrypt_key_factory">DES</string>
 
@@ -90,6 +94,7 @@
     <string name="error_marker_already_deleted">Cannot complete this task. Marker already deleted by the owner.</string>
     <string name="error_recipient_not_on_your_contact_list">Recipient is not on your contact list.</string>
     <string name="error_device_is_already_registered">Device is already registered.</string>
+    <string name="error_marker_cannot_be_deleted">Marker cannot be deleted because it is currently used.</string>
 
     <!-- message prompts -->
     <string name="message_login_successful">Account has been successfully logged in.</string>
@@ -132,6 +137,9 @@
     <string name="prompt_set_marker">Do you want to start heading to this location?</string>
     <string name="prompt_stop_marker">Do you want to stop heading to this location?</string>
     <string name="prompt_share_marker">Share your marker to anyone in your contact list:</string>
+    <string name="prompt_title">Title</string>
+    <string name="prompt_description">Description</string>
+    <string name="prompt_enter_marker_details">Enter marker details:</string>
 
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>

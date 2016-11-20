@@ -10,8 +10,6 @@
         android:id="@+id/faMenu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         android:paddingRight="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
@@ -25,7 +23,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/create_marker"
             fab:fab_size="mini"
-            fab:fab_label="Create Marker" />
+            fab:fab_label="@string/label_create_marker" />
 
         <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
             android:id="@+id/sendRequest"
@@ -33,7 +31,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/send_request"
             fab:fab_size="mini"
-            fab:fab_label="Send Request" />
+            fab:fab_label="@string/label_send_request" />
 
         <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
             android:id="@+id/acceptRejectRequest"
@@ -41,7 +39,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/incoming_requests"
             fab:fab_size="mini"
-            fab:fab_label="Incoming Requests" />
+            fab:fab_label="@string/label_incoming_requests" />
 
         <sp.ics.uplb.gtrack.menus.fab.FloatingActionButton
             android:id="@+id/usersDirectory"
@@ -49,7 +47,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/contacts"
             fab:fab_size="mini"
-            fab:fab_label="Contact List" />
+            fab:fab_label="@string/label_contacts" />
 
     </sp.ics.uplb.gtrack.menus.fab.FloatingActionMenu>
 

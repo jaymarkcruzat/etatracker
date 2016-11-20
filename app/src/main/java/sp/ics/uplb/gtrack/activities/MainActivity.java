@@ -7,7 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -28,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -41,9 +46,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -104,6 +113,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public ArrayList<Marker> markersList = new ArrayList<Marker>();
     public boolean markersLoaded = false;
     public boolean contactsLoaded = false;
+    public Polyline polyline = null;
+    public Circle circle = null;
+    public Marker currentUserIcon = null;
+    public LatLng targetLocationLatLng = null;
+    public ImageView myLocationView = null;
 
     public HashMap<String,Button> connectedUsersButtons= null;
     public HashMap<String,EditText> connectedUsersTextPanel= null;
@@ -154,6 +168,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         connectedUsersButtons = new HashMap<String,Button>();
         connectedUsersTextPanel = new HashMap<String,EditText>();
         horizontalViews = new HashMap<String,LinearLayout>();
+        myLocationView = (ImageView)findViewById(R.id.currentLocationButton);
+        myLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLocation!=null) {
+                    moveCamera(currentLocation);
+                }
+            }
+        });
 
         if (params !=null && sharedPreference.getString(Constants.USER_EMAIL,null)==null) {
             editor.putString(Constants.USER_EMAIL, emailAddress  = params.getString(Constants.USER_EMAIL));
@@ -187,10 +210,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ((MenusFragment)fragment).setMainActivity(this);
         fragmentTransaction.replace(R.id.fragment, fragment).commit();
 
+        String target = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
+        String targetLatitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, null);
+        String targetLongitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, null);
         if (!isServiceActive(FirebaseListenerService.class)) {
-            String target = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
-            String targetLatitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, null);
-            String targetLongitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, null);
             Intent intent = new Intent(getApplicationContext(), FirebaseListenerService.class);
             intent.putExtra(Constants.USER_EMAIL, emailAddress);
             intent.putExtra(Constants.USER_NAME, userName);
@@ -201,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             intent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, targetLongitude);
             startService(intent);
         }
+        if (!Common.isNull(target) && !Common.isNull(targetLatitude) && !Common.isNull(targetLongitude)) targetLocationLatLng = new LatLng(Double.parseDouble(targetLatitude),Double.parseDouble(targetLongitude));
 
     }
 
@@ -236,6 +260,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             unregisterReceiver(locationBroadcastReceiver);
             locationBroadcastReceiver=null;
         }
+        if (selectedMarker!=null) selectedMarker.remove();
+        if (currentUserIcon!=null) currentUserIcon.remove();
+        googleMap.clear();
         super.onDestroy();
     }
 
@@ -482,7 +509,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
         Common.checkPermission(getApplicationContext());
-        googleMap.setMyLocationEnabled(true);
+
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        googleMap.setMyLocationEnabled(false);
+
         googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(), this));
         googleMap.setOnMarkerClickListener(new OnMarkerClickListener(this));
         googleMap.setOnInfoWindowCloseListener(new OnMarkerCloseListener(this));
@@ -704,7 +734,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return Markers.create(getApplicationContext(),markerTitle,markerDesc,latitude,longitude,Constants.GLOBAL_ZERO,userCode);
             }
         };
-        saveMarkerToRemoteServerTask.execute((Void)null);
+        saveMarkerToRemoteServerTask.execute((Void) null);
     }
 
     private void removeUserComponents(String userName) {
@@ -723,7 +753,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             horizontalView.removeAllViews();
             if (parentLayout!=null) parentLayout.removeView(horizontalView);
         }
-        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_user_is_now_disconnected) + " " + userName+".");
+        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_user_is_now_disconnected) + " " + userName + ".");
     }
 
     private void sendDisconnectIntent(String userNameToBeDisconnected) {
@@ -801,9 +831,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             editText.setLayoutParams(layoutParams);
             connectedUsersTextPanel.put(userName,editText);
         }
-        editText.setText(userName + "→[ "+targetLocation +" ]"+ Constants.GLOBAL_NEW_LINE +
-                         "Speed: " + speed + " m/s ETA: " +eta+ " min" + Constants.GLOBAL_NEW_LINE +
-                         "Received: "+timeStamp);
+        editText.setText(userName + "→[ " + targetLocation + " ]" + Constants.GLOBAL_NEW_LINE +
+                "Speed: " + speed + " m/s ETA: " + eta + " min" + Constants.GLOBAL_NEW_LINE +
+                "Received: " + timeStamp);
         editText.invalidate();
 
         LinearLayout horizontalView = horizontalViews.containsKey(userName) ? horizontalViews.get(userName) : null;
@@ -830,6 +860,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             CameraPosition cameraPosition = new CameraPosition.Builder().target(target).zoom(zoom).tilt(tilt == 0 ? 30 : tilt).bearing(bearing == 0 ? 1 : bearing).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
+    }
+
+    public void removePolyline() {
+        if (polyline!=null) {
+            polyline.remove();
+            polyline = null;
+        }
+    }
+
+    private void redrawPolyline(ArrayList route) {
+        Logger.print("redrawPolyline");
+        if (polyline!=null) {
+            polyline.remove();
+        }
+        polyline = googleMap.addPolyline(new PolylineOptions().addAll(route).width(2).color(Color.CYAN));
+    }
+
+    private void redrawCircle(final LatLng latLng) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (circle!=null) circle.remove();
+                circle = googleMap.addCircle(new CircleOptions().center(latLng).radius(4).strokeColor(Color.BLUE).fillColor(Color.CYAN));
+            }
+        });
+    }
+
+    private void redrawCurrentUserIcon(final LatLng latLng) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (currentUserIcon != null) currentUserIcon.remove();
+                currentUserIcon = googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.current_user)).position(latLng));
+                currentUserIcon.setDraggable(false);
+            }
+        });
     }
 
     public static class LocationBroadcastReceiver extends BroadcastReceiver {
@@ -871,9 +937,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         mainActivityInstance.moveCamera(mainActivityInstance.currentLocation);
                                         mainActivityInstance.initializeMap();
                                     }
+                                    if (mainActivityInstance.currentLocation!=null) {
+                                        mainActivityInstance.redrawCurrentUserIcon(mainActivityInstance.currentLocation);
+                                        if (mainActivityInstance.targetLocationLatLng!=null && mainActivityInstance.markersLoaded) {
+                                            ArrayList<LatLng> route = new ArrayList<>();
+                                            route.add(mainActivityInstance.currentLocation);
+                                            route.add(mainActivityInstance.targetLocationLatLng);
+                                            mainActivityInstance.redrawPolyline(route);
+                                        }
+                                    }
                                 }
-                            } else
-                                mainActivityInstance.updateUserPosition(latitude, longitude, userCode, userName, speed, eta, timeStamp, targetLocation);
+                            } else mainActivityInstance.updateUserPosition(latitude, longitude, userCode, userName, speed, eta, timeStamp, targetLocation);
                         }
                     }
                 }

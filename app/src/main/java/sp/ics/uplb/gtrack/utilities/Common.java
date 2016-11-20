@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -64,6 +66,16 @@ public class Common {
 
     public static boolean isPasswordValid(String password) {
         return password.matches("((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,15})");
+    }
+
+    public static float getLocationDistanceInMeters(LatLng latLng1,LatLng latLng2) {
+        Location location1 = new Location(Constants.GLOBAL_BLANK);
+        location1.setLatitude(latLng1.latitude);
+        location1.setLongitude(latLng1.longitude);
+        Location location2 = new Location(Constants.GLOBAL_BLANK);
+        location2.setLatitude(latLng2.latitude);
+        location2.setLongitude(latLng2.longitude);
+        return  location1.distanceTo(location2);
     }
 
     public static boolean isGPSEnabled(Context context) {

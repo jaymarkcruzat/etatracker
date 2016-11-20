@@ -63,7 +63,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     private String targetLocationLongitude = null;
     private ArrayList connectedPeers = new ArrayList();
     private ArrayList ignoreList = new ArrayList();
-    private Node lastNode = null;
+    private Node previousNode = null;
 
     synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
@@ -84,11 +84,20 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     @Override
     public void onLocationChanged(Location location) {
 
-        final List<Contact> contacts = db.getAllConnectedContacts();
+        final List<Contact> contacts;
         final double latitude = location.getLatitude();
         final double longitude = location.getLongitude();
         final double speed = location.getSpeed();
         final double eta = 0d;
+
+        try {
+            contacts = db.getAllConnectedContacts();
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.print("Error in retrieving connected contacts...");
+            return;
+        }
 
         Intent intentGPS = new Intent();
         intentGPS.putExtra(Constants.KEY_CURRENT_GPS_LATITUDE, String.valueOf(latitude));
@@ -103,9 +112,11 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         sendBroadcast(intentGPS);
 
         userFirebaseId = SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_FIREBASEID,null);
+
         Logger.print("Target Location :=> "+targetLocation+" "+targetLocationLatitude+","+targetLocationLongitude);
 
         if (!Common.isNull(targetLocation) && !Common.isNull(targetLocationLatitude) && !Common.isNull(targetLocationLongitude)) {
+            Logger.print("Target Location is set.");
             double target_latitude = Double.parseDouble(targetLocationLatitude);
             double target_longitude = Double.parseDouble(targetLocationLongitude);
             Location targetLocation = new Location(Constants.GLOBAL_BLANK);
@@ -115,10 +126,12 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                 sendNotification(getString(R.string.message_target_reached));
             }
             else {
-                
+
             }
         }
-        else Logger.print("Target Location is not set.");
+        else {
+            Logger.print("Target Location is not set.");
+        }
 
         Iterator iterator = contacts.iterator();
         if (Common.isInternetConnectionAvailable()) {
@@ -370,14 +383,8 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(Constants.LOCATION_REQUEST_INTERVAL);
         locationRequest.setFastestInterval(Constants.LOCATION_REQUEST_INTERVAL);
+        //locationRequest.setSmallestDisplacement(Constants.SMALLEST_DISPLACEMENT);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
         }
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);

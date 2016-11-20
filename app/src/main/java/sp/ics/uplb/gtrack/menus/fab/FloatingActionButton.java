@@ -37,6 +37,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import sp.ics.uplb.gtrack.R;
+import sp.ics.uplb.gtrack.utilities.Logger;
 
 public class FloatingActionButton extends ImageButton {
 

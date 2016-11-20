@@ -59,6 +59,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
         switch (v.getId()) {
             case R.id.deleteButton: {
                 if (mainActivity.selectedMarker != null) {
+                    String target = SharedPref.getString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
+                    if (target!=null) {
+                        if (target.equals(mainActivity.selectedMarker.getTitle())) {
+                            Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), mainActivity.getString(R.string.error_marker_cannot_be_deleted));
+                            return;
+                        }
+                    }
                     LayoutInflater li = LayoutInflater.from(mainActivity);
                     View deleteMarkerView = li.inflate(R.layout.new_delete_marker_dialog, null);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mainActivity);
@@ -134,6 +141,10 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         if (status.equals(Constants.MESSAGE_UPDATE_SUCCESSFUL)) {
                                             String markerTitle = ((EditText) newMarkerView.findViewById(R.id.markerTitle)).getText().toString();
                                             String markerDescription = ((EditText) newMarkerView.findViewById(R.id.markerDescription)).getText().toString();
+
+                                            String target = SharedPref.getString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
+                                            if (target!=null && target.equals(mainActivity.selectedMarker.getTitle())) SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, markerTitle);
+
                                             mainActivity.selectedMarker.setTitle(markerTitle);
                                             mainActivity.selectedMarker.setSnippet(markerDescription);
                                             mainActivity.selectedMarker.showInfoWindow();
@@ -209,7 +220,8 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             intent.putExtra(Constants.TARGET_LOCATION, target == null || !target.equals(title) ? title : null);
                                             intent.putExtra(Constants.TARGET_LOCATION_LATITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().latitude) : null);
                                             intent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, target == null || !target.equals(title) ? String.valueOf(mainActivity.selectedMarker.getPosition().longitude) : null);
-
+                                            mainActivity.targetLocationLatLng = target == null || !target.equals(title) ? mainActivity.selectedMarker.getPosition() : null;
+                                            mainActivity.removePolyline();
                                             mainActivity.startService(intent);
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(target == null || !target.equals(title) ? R.string.message_meeting_point_set : R.string.message_meeting_point_unset));
                                         } else if (status.contains(Constants.STATUS_ERROR))
@@ -349,6 +361,14 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             mainActivity.markerButtonShare.setVisibility(View.VISIBLE);
                                             mainActivity.markerButtonMove.setVisibility(View.VISIBLE);
                                             mainActivity.selectedMarker = marker;
+                                            String target = SharedPref.getString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
+                                            if (mainActivity.selectedMarker.getTitle().equals(target)) {
+                                                mainActivity.targetLocationLatLng = new LatLng(marker.getPosition().latitude,marker.getPosition().longitude);
+                                                SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, mainActivity.selectedMarker.getTitle());
+                                                SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, String.valueOf(mainActivity.selectedMarker.getPosition().latitude));
+                                                SharedPref.setString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, String.valueOf(mainActivity.selectedMarker.getPosition().longitude));
+                                                mainActivity.removePolyline();
+                                            }
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_moved_success));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));

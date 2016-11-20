@@ -24,6 +24,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Logger.print("SQLiteDatabaseHandler onCreate");
         String CREATE_CONTACTS_CONNECTED_TABLE = "CREATE TABLE " + Constants.TABLE_CONTACTS_CONNECTED + "(" + Constants.KEY_ID + " INTEGER PRIMARY KEY," + Constants.KEY_NAME + " TEXT," + Constants.KEY_FIREBASEID + " TEXT" + ")";
         db.execSQL(CREATE_CONTACTS_CONNECTED_TABLE);
         String CREATE_CONTACTS_LIST_TABLE = "CREATE TABLE " + Constants.TABLE_CONTACTS_LIST + "(" + Constants.KEY_ID + " INTEGER PRIMARY KEY," + Constants.KEY_NAME + " TEXT," + Constants.KEY_FIREBASEID + " TEXT" + ")";
@@ -52,14 +53,6 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Contact getConnectedContact(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(Constants.TABLE_CONTACTS_CONNECTED, new String[]{Constants.KEY_ID, Constants.KEY_NAME, Constants.KEY_FIREBASEID}, Constants.KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
-        if (cursor != null) cursor.moveToFirst();
-        Contact contact = new Contact(Integer.parseInt(cursor.getString(0)),cursor.getString(1), cursor.getString(2));
-        return contact;
-    }
-
     public boolean connectedContactExists(String name) {
         String selectQuery = "SELECT  * FROM " + Constants.TABLE_CONTACTS_CONNECTED + " WHERE " + Constants.KEY_NAME + "='" + name +"'";
         SQLiteDatabase db = this.getWritableDatabase();
@@ -86,22 +79,6 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         return contactList;
-    }
-
-    public int getConnectedContactsCount() {
-        String countQuery = "SELECT  * FROM " + Constants.TABLE_CONTACTS_CONNECTED;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
-        return cursor.getCount();
-    }
-
-    public int updateConnectedContact(Contact contact) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(Constants.KEY_NAME, contact.getName());
-        values.put(Constants.KEY_FIREBASEID, contact.getFirebaseId());
-        return db.update(Constants.TABLE_CONTACTS_CONNECTED, values, Constants.KEY_ID + " = ?",new String[]{String.valueOf(contact.getID())});
     }
 
     public void deleteConnectedContact(String userName) {
@@ -190,7 +167,7 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
 
     //NODE
 
-    public void addNode(Node node) {
+    public Node addNode(Node node) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(Constants.KEY_NODE_LATITUDE, node.getLatitude());
@@ -198,19 +175,41 @@ public class SQLiteDatabaseHandler extends SQLiteOpenHelper {
         values.put(Constants.KEY_NODE_DEST_LATITUDE, node.getDestLatitude());
         values.put(Constants.KEY_NODE_DEST_LONGITUDE, node.getDestLongitude());
         values.put(Constants.KEY_NODE_NEXT, node.getNodeNext());
-        db.insert(Constants.TABLE_NODE, null, values);
+        long primarykey = db.insert(Constants.TABLE_NODE, null, values);
+        node.setId(primarykey);
         db.close();
+        return node;
     }
 
-    public boolean isNodeExists(double latitude,double longitude,double dest_latitude,double dest_longitude) {
-        String selectQuery = "SELECT  * FROM " + Constants.TABLE_NODE + " WHERE " + Constants.KEY_NODE_LATITUDE + "=" + latitude +" AND "+Constants.KEY_NODE_LONGITUDE + "=" +longitude +" AND "+Constants.KEY_NODE_DEST_LATITUDE + "=" +dest_latitude+" AND "+Constants.KEY_NODE_DEST_LONGITUDE + "=" +dest_longitude;
+    public int updateNodeNext(Node node) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor.getCount()<=0) {
-            cursor.close();
-            return false;
+        ContentValues values = new ContentValues();
+        values.put(Constants.KEY_NODE_NEXT, node.getNodeNext());
+        return db.update(Constants.TABLE_NODE, values, Constants.KEY_ID + " = ?",new String[]{String.valueOf(node.getId())});
+    }
+
+    public List<Node> getNodesAdjacentTo(Node refNode) {
+        List<Node> nodeList = new ArrayList<Node>();
+        String selectQuery = "SELECT  * FROM " + Constants.TABLE_NODE + " WHERE "+  Constants.KEY_NODE_LATITUDE         +"=? "+"AND "+
+                                                                                    Constants.KEY_NODE_LONGITUDE        +"=? "+"AND "+
+                                                                                    Constants.KEY_NODE_DEST_LATITUDE    +"=? "+"AND "+
+                                                                                    Constants.KEY_NODE_DEST_LONGITUDE   +"=? ";
+        String []selectArgs = new String[]{String.valueOf(refNode.getLatitude()),String.valueOf(refNode.getLongitude()),String.valueOf(refNode.getDestLatitude()),String.valueOf(refNode.getDestLongitude())};
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, selectArgs);
+        if (cursor.moveToFirst()) {
+            do {
+                Node node = new Node();
+                node.setId(Long.parseLong(cursor.getString(0)));
+                node.setLatitude(Double.parseDouble(cursor.getString(1)));
+                node.setLongitude(Double.parseDouble(cursor.getString(2)));
+                node.setDestLatitude(Double.parseDouble(cursor.getString(3)));
+                node.setDestLongitude(Double.parseDouble(cursor.getString(4)));
+                node.setNodeNext(Long.parseLong(cursor.getString(5)));
+                nodeList.add(node);
+            } while (cursor.moveToNext());
         }
-        return true;
+        return nodeList;
     }
 
 }

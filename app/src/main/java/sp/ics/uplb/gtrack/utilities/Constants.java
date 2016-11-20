@@ -7,6 +7,7 @@ public class Constants {
     public static final int END_ROUTE                                       = -1;
     public static final long LOCATION_REQUEST_INTERVAL                      = 5000;
     public static final long MIN_DISTANCE_TO_REACH_TARGET                   = 1;
+    public static final float SMALLEST_DISPLACEMENT                         = 1;
 
     public static final String INTENT_DRAW_GPS                              = "sp.ics.uplb.gtrack.DRAW_GPS_INTENT";
     public static final String INTENT_DISCONNECT                            = "sp.ics.uplb.gtrack.DISCONNECT";

@@ -2,14 +2,16 @@ package sp.ics.uplb.gtrack.controllers;
 
 public class Node {
 
-    private int id;
+    private long id;
     private double node_latitude;
     private double node_longitude;
     private double node_dest_latitude;
     private double node_dest_longitude;
-    private int node_next;
+    private long node_next;
 
-    public Node(double node_latitude,double node_longitude,double node_dest_latitude,double node_dest_longitude,int node_next) {
+    public Node() {}
+
+    public Node(double node_latitude,double node_longitude,double node_dest_latitude,double node_dest_longitude,long node_next) {
         setLatitude(node_latitude);
         setLongitude(node_longitude);
         setDestLatitude(node_dest_latitude);
@@ -17,11 +19,20 @@ public class Node {
         setNodeNext(node_next);
     }
 
-    public void setId(int id) {
+    public Node(long id, double node_latitude,double node_longitude,double node_dest_latitude,double node_dest_longitude,long node_next) {
+        setId(id);
+        setLatitude(node_latitude);
+        setLongitude(node_longitude);
+        setDestLatitude(node_dest_latitude);
+        setDestLongitude(node_dest_longitude);
+        setNodeNext(node_next);
+    }
+
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -57,11 +68,11 @@ public class Node {
         return node_dest_longitude;
     }
 
-    public void setNodeNext(int node_next) {
+    public void setNodeNext(long node_next) {
         this.node_next = node_next;
     }
 
-    public int getNodeNext() {
+    public long getNodeNext() {
         return node_next;
     }
 }

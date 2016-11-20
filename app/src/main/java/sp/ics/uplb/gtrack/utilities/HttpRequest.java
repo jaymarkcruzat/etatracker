@@ -70,7 +70,14 @@ public class HttpRequest {
                 try {
                     inputStream = conn.getInputStream();
                 } catch (IOException ex) {}
-                reader = new BufferedReader(new InputStreamReader(inputStream));
+                try {
+                    reader = new BufferedReader(new InputStreamReader(inputStream));
+                }
+                catch (Exception ex) {
+                    String response = "{\"code\":7,\"message\":\"error_network_unreachable\"}";
+                    JSONObject jsonObject = JSONParser.getJSONObject(response);
+                    return jsonObject;
+                }
             }
             else {
                 String response = "{\"code\":7,\"message\":\"error_network_unreachable\"}";
