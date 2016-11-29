@@ -95,6 +95,8 @@ public class Common {
             String address = Constants.FIREBASE_APP.substring(8);
             Logger.print("Pinging address: "+address.replace("/",""));
             Process pingProcess = runTime.exec("/system/bin/ping -c 1 "+address.replace("/",""));
+            //Process pingProcess = runTime.exec("/system/bin/ping -c 1 127.0.0.1");
+
             int exitValue = pingProcess.waitFor();
             return (exitValue == 0);
         } catch (IOException e) { e.printStackTrace(); }

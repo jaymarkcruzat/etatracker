@@ -1,18 +1,19 @@
 package sp.ics.uplb.gtrack.services;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.media.RingtoneManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -23,7 +24,6 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.ServerValue;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -34,15 +34,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import sp.ics.uplb.gtrack.R;
-import sp.ics.uplb.gtrack.Tracker;
 import sp.ics.uplb.gtrack.activities.MainActivity;
 import sp.ics.uplb.gtrack.controllers.Contact;
-import sp.ics.uplb.gtrack.controllers.Node;
 import sp.ics.uplb.gtrack.controllers.SQLiteDatabaseHandler;
 import sp.ics.uplb.gtrack.controllers.SharedPref;
 import sp.ics.uplb.gtrack.utilities.Common;
@@ -58,12 +55,15 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     private String userCode = null;
     private String userName = null;
     private String userFirebaseId = null;
-    private String targetLocation = null;
-    private String targetLocationLatitude = null;
-    private String targetLocationLongitude = null;
     private ArrayList connectedPeers = new ArrayList();
     private ArrayList ignoreList = new ArrayList();
-    private Node previousNode = null;
+    private SharedPreferences sharedPreference = null;
+    private SharedPreferences.OnSharedPreferenceChangeListener spChangeListener = null;
+    private FirebaseBroadcastReceiver firebaseBroadcastReceiver = null;
+    private IntentFilter firebaseIntentFilter = null;
+    public static String targetLocation = null;
+    public static String targetLocationLatitude = null;
+    public static String targetLocationLongitude = null;
 
     synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
@@ -79,10 +79,18 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     public void onDestroy() {
         stopForeground(true);
         googleApiClient.disconnect();
+        if (sharedPreference!=null && spChangeListener!=null) {
+            sharedPreference.unregisterOnSharedPreferenceChangeListener(spChangeListener);
+            sharedPreference = null;
+            spChangeListener = null;
+        }
+        if (firebaseBroadcastReceiver!=null) {
+            unregisterReceiver(firebaseBroadcastReceiver);
+            firebaseBroadcastReceiver=null;
+        }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+    private void sendLocationData(Location location) {
 
         final List<Contact> contacts;
         final double latitude = location.getLatitude();
@@ -99,6 +107,8 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
             return;
         }
 
+        Logger.print("targetLocation: "+targetLocation+" targetLocationLatitude:"+targetLocationLatitude+" targetLocationLongitude:"+targetLocationLongitude);
+
         Intent intentGPS = new Intent();
         intentGPS.putExtra(Constants.KEY_CURRENT_GPS_LATITUDE, String.valueOf(latitude));
         intentGPS.putExtra(Constants.KEY_CURRENT_GPS_LONGITUDE, String.valueOf(longitude));
@@ -113,26 +123,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
         userFirebaseId = SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_FIREBASEID,null);
 
-        Logger.print("Target Location :=> "+targetLocation+" "+targetLocationLatitude+","+targetLocationLongitude);
-
-        if (!Common.isNull(targetLocation) && !Common.isNull(targetLocationLatitude) && !Common.isNull(targetLocationLongitude)) {
-            Logger.print("Target Location is set.");
-            double target_latitude = Double.parseDouble(targetLocationLatitude);
-            double target_longitude = Double.parseDouble(targetLocationLongitude);
-            Location targetLocation = new Location(Constants.GLOBAL_BLANK);
-            targetLocation.setLatitude(target_latitude);
-            targetLocation.setLongitude(target_longitude);
-            if (isTargetLocationReached(location, targetLocation)) {
-                sendNotification(getString(R.string.message_target_reached));
-            }
-            else {
-
-            }
-        }
-        else {
-            Logger.print("Target Location is not set.");
-        }
-
         Iterator iterator = contacts.iterator();
         if (Common.isInternetConnectionAvailable()) {
             while (iterator.hasNext()) {
@@ -142,7 +132,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                     protected Object doInBackground(Object[] params) {
                         try {
                             FirebaseAction.firebasePush(getApplicationContext(), contact.getFirebaseId(), Constants.KEY_CURRENT_GPS + userCode,
-                                            new JSONObject()
+                                    new JSONObject()
                                             .put(Constants.KEY_USER_CODE, userCode)
                                             .put(Constants.KEY_SENDER_USER_NAME, userName)
                                             .put(Constants.KEY_CURRENT_GPS_LATITUDE, latitude)
@@ -151,7 +141,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                                             .put(Constants.KEY_CURRENT_ETA, eta)
                                             .put(Constants.KEY_SENDER_FIREBASEID, userFirebaseId)
                                             .put(Constants.KEY_FBASE_SERVER_TIMESTAMP, Common.convertDateToString(Common.getCurrentTime()))
-                                            .put(Constants.KEY_TARGET_LOCATION,targetLocation==null? Constants.GLOBAL_BLANK : targetLocation).toString());
+                                            .put(Constants.KEY_TARGET_LOCATION,Constants.GLOBAL_BLANK).toString());
                             Logger.print("GPS Data Sent!");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -163,6 +153,17 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
             }
         }
         else Logger.print("Connection is unavailable.");
+    }
+
+    @Override
+    public void onLocationChanged(final Location location) {
+        AsyncTask sendLocation = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                sendLocationData(location);
+                return null;
+            }
+        }.execute((Void)null);
     }
 
     private boolean isTargetLocationReached(Location location, Location targetLocation) {
@@ -182,7 +183,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         if (db.connectedContactExists(userName)) {
             db.deleteConnectedContact(userName);
         }
-        Logger.print("Disconnect "+(db.connectedContactExists(userName) ? "Failed!" : "Success!"));
+        Logger.print("Disconnect " + (db.connectedContactExists(userName) ? "Failed!" : "Success!"));
     }
 
     private void sendDisconnectMessageTo(String userName) {
@@ -196,8 +197,12 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
         Firebase firebase;
         String firebaseid;
-        final SharedPreferences sharedPreference = getSharedPreferences(Constants.SHARED_PREF, MODE_PRIVATE);
         buildGoogleApiClient();
+
+        sharedPreference = SharedPref.getInstance(this);
+        if (firebaseBroadcastReceiver==null) firebaseBroadcastReceiver = new FirebaseBroadcastReceiver();
+        if (firebaseIntentFilter==null) firebaseIntentFilter=new IntentFilter();
+        registerReceiver(firebaseBroadcastReceiver,firebaseIntentFilter);
 
         if (intent!=null) {
             Bundle params = intent.getExtras();
@@ -208,9 +213,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
             userCode = (String) params.get(Constants.USER_CODE);
             userName = (String) params.get(Constants.USER_EMAIL);
             userFirebaseId = (String) params.get(Constants.USER_FIREBASEID);
-            targetLocation = (String) params.get(Constants.TARGET_LOCATION);
-            targetLocationLatitude = (String) params.get(Constants.TARGET_LOCATION_LATITUDE);
-            targetLocationLongitude = (String) params.get(Constants.TARGET_LOCATION_LONGITUDE);
             String userToDisconnect = (String) params.get(Constants.DISCONNECT);
             if (userToDisconnect!=null) {
                 lockGPSReceiver(userToDisconnect);
@@ -246,10 +248,10 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                                 Contact newContact = new Contact(Integer.parseInt(userCode), userName, userFirebaseID);
                                 db.addListContact(newContact);
                             }
-                            sendNotification(userName + " " + getString(R.string.ticker_accept_request));
+                            sendNotification(String.format(getString(R.string.ticker_accept_request), userName));
                             fbase.child(key).removeValue();
                         } else if (key.contains(Constants.KEY_REQUEST_FROM)) {
-                            sendNotification(getString(R.string.ticker_request) + " " + value);
+                            sendNotification(String.format(getString(R.string.ticker_request), value));
                             fbase.child(key).removeValue();
                         } else if (key.contains(Constants.KEY_SHARE_FROM)) {
                             JSONObject jsonObject = JSONParser.getJSONObject(value);
@@ -258,7 +260,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                             String location_long = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_MARKER_LONGITUDE);
                             String sender = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_SENDER_USER_NAME);
                             String senderfirebaseid = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_SENDER_FIREBASEID);
-                            sendNotification(getString(R.string.ticker_meeting) + " <" + sender + ">" + " at <" + location + ">");
+                            sendNotification(String.format(getString(R.string.ticker_meeting), sender, location));
                             fbase.child(key).removeValue();
                             Intent mainActivity = new Intent(getApplicationContext(), MainActivity.class);
                             mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -273,13 +275,12 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                             JSONObject jsonObject = JSONParser.getJSONObject(value);
                             String location = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_MARKER_TITLE);
                             String receiver = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_RECEIVER_USER_NAME);
-                            String receiver_firebaseid = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_RECEIVER_FIREBASEID);
-                            sendNotification("<" + receiver + "> " + getString(R.string.ticker_accept_meeting) + " <" + location + ">");
+                            sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_RECEIVER_FIREBASEID);
+                            sendNotification(String.format(getString(R.string.ticker_accept_meeting), receiver, location));
                             fbase.child(key).removeValue();
                         } else if (key.contains(Constants.KEY_CURRENT_GPS)) {
                             Intent intentGPS = new Intent();
                             JSONObject jsonObject = JSONParser.getJSONObject(value);
-
                             String current_gps_latitude = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_CURRENT_GPS_LATITUDE);
                             String current_gps_longitude = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_CURRENT_GPS_LONGITUDE);
                             String user_code = sp.ics.uplb.gtrack.utilities.JSONObject.get(jsonObject, Constants.KEY_USER_CODE);
@@ -304,7 +305,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                                     intentGPS.putExtra(Constants.KEY_TARGET_LOCATION, targetLocation);
                                     intentGPS.setAction(Constants.INTENT_DRAW_GPS);
                                     sendBroadcast(intentGPS);
-
                                     if (!db.connectedContactExists(sender_user_name)) {
                                         int id = Integer.parseInt(user_code);
                                         Contact contact = new Contact(id, sender_user_name, sender_firebaseid);
@@ -363,7 +363,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         builder.setStyle(new NotificationCompat.BigTextStyle().bigText(Constants.GLOBAL_BLANK));
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         builder.setContentTitle(getString(R.string.app_name));
-        builder.setContentText(getString(R.string.label_notify_location_service_running));
         Notification notification = builder.build();
         startForeground(R.string.app_name, notification);
     }
@@ -372,6 +371,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         if (builder!=null) {
             builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
             builder.setTicker(message);
+            builder.setSubText(message);
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
             startForeground(R.string.app_name, builder.build());
         }
@@ -399,6 +399,26 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+    }
+
+    public static void updateTargetLocation(String location,String latitude, String longitude) {
+        Logger.print("updateTargetLocation");
+        targetLocation = location;
+        targetLocationLatitude = latitude;
+        targetLocationLongitude = longitude;
+    }
+
+    public static class FirebaseBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (action.equals(Constants.INTENT_SET_TARGET)) {
+                updateTargetLocation(intent.getStringExtra(Constants.TARGET_LOCATION),
+                        intent.getStringExtra(Constants.TARGET_LOCATION_LATITUDE),
+                        intent.getStringExtra(Constants.TARGET_LOCATION_LONGITUDE));
+            }
+        }
     }
 
 }

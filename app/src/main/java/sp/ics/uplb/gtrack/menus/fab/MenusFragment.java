@@ -290,7 +290,7 @@ public class MenusFragment extends Fragment {
                                     String status = null;
                                     @Override
                                     protected void onPostExecute(Object jsonResponse) {
-                                    if (status.equals(Constants.MESSAGE_FIREBASE_PUSH_SUCCESSFUL)) Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_request_send_successful)+" "+emailAddressParticipant);
+                                    if (status.equals(Constants.MESSAGE_FIREBASE_PUSH_SUCCESSFUL)) Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), String.format(mainActivity.getString(R.string.message_request_send_successful),emailAddressParticipant));
                                     else Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getActivity().getApplicationContext(), R.color.error), Common.getErrorMessage(getActivity().getApplicationContext(), status));
                                     }
                                     @Override

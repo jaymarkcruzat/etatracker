@@ -2,10 +2,12 @@ package sp.ics.uplb.gtrack.activities;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -125,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private HashMap<String,Marker> connectedUsersMarkers = null;
 
     private static MainActivity mainActivityRunningInstance;
-
     public static MainActivity getInstance() {
         return mainActivityRunningInstance;
     }
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 if (currentLocation!=null) {
-                    moveCamera(currentLocation);
+                    moveToLocation(currentLocation);
                 }
             }
         });
@@ -226,6 +228,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (!Common.isNull(target) && !Common.isNull(targetLatitude) && !Common.isNull(targetLongitude)) targetLocationLatLng = new LatLng(Double.parseDouble(targetLatitude),Double.parseDouble(targetLongitude));
 
+    }
+
+    private void moveToLocation(LatLng location) {
+        CameraPosition currentCP = googleMap.getCameraPosition();
+        float cpTilt = currentCP.tilt;
+        float cpBearing = currentCP.bearing;
+        float cpZoom = currentCP.zoom;
+        CameraPosition cameraPosition = new CameraPosition.Builder().tilt(cpTilt).bearing(cpBearing).zoom(cpZoom).target(location).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -494,6 +505,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             protected Object doInBackground(Object[] params) {
                 publishProgress(getString(R.string.progress_retrievingcontacts));
+
                 return Request.getApprovedRequestsByUserId(getApplicationContext(), userCode);
             }
         };
@@ -517,15 +529,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.setOnMarkerClickListener(new OnMarkerClickListener(this));
         googleMap.setOnInfoWindowCloseListener(new OnMarkerCloseListener(this));
         googleMap.setOnCameraChangeListener(new OnCameraChangeListener(this));
-        googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-            @Override
-            public boolean onMyLocationButtonClick() {
-                if (currentLocation != null) {
-                    moveCamera(currentLocation);
-                }
-                return false;
-            }
-        });
 
     }
 
@@ -549,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LayoutInflater li = LayoutInflater.from(this);
         View acceptRejectView = li.inflate(R.layout.acceptreject_meeting_dialog, null);
         TextView acceptRejectTextView = (TextView)acceptRejectView.findViewById(R.id.acceptreject_meeting_dialog);
-        acceptRejectTextView.setText("You were invited by <" + sender + "> to meet at location <" + location + ">. Do you want to accept this request?");
+        acceptRejectTextView.setText(String.format(getString(R.string.prompt_accept_request),sender,location));
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setView(acceptRejectView);
         alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_ACCEPT, new DialogInterface.OnClickListener() {
@@ -693,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }).setNegativeButton(Constants.GLOBAL_REJECT, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_meeting_request_rejected) + Constants.GLOBAL_SPACE + "<" + sender + ">");
+                Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_meeting_request_rejected),sender));
                 dialog.cancel();
             }
         });
@@ -711,7 +714,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String status = (String) ((JSONObject) jsonResponse).get(Constants.STATUS_MESSAGE);
                     if (status.equals(Constants.MESSAGE_INSERT_SUCCESSFUL)) {
                         //display shared location
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_meeting_request_accepted) + Constants.GLOBAL_SPACE  + sender + ".");
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_meeting_request_accepted),sender));
                         LatLng latLng = new LatLng(latitude,longitude);
                         Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).snippet(markerDesc).title(markerTitle).draggable(false).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
                         marker.showInfoWindow();
@@ -753,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             horizontalView.removeAllViews();
             if (parentLayout!=null) parentLayout.removeView(horizontalView);
         }
-        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_user_is_now_disconnected) + " " + userName + ".");
+        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_user_is_now_disconnected),userName));
     }
 
     private void sendDisconnectIntent(String userNameToBeDisconnected) {

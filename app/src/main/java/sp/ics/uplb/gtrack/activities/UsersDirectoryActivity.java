@@ -61,7 +61,7 @@ public class UsersDirectoryActivity extends AppCompatActivity {
         userFirebaseID = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.USER_FIREBASEID, null);
         db = new SQLiteDatabaseHandler(this,userCode);
 
-        setTitle(displayMode);
+        setTitle(Constants.GLOBAL_BLANK);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {

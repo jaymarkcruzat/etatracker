@@ -6,29 +6,29 @@
                 <item
                     android:id="@+id/nav_markers"
                     android:icon="@drawable/create_marker"
-                    android:title="Markers" />
+                    android:title="@string/prompt_markers" />
                 <item
                     android:id="@+id/nav_participants"
                     android:icon="@drawable/contacts"
-                    android:title="Contact List" />
+                    android:title="@string/prompt_contacts" />
                 <item
                     android:id="@+id/nav_meeting"
                     android:icon="@drawable/meetings"
-                    android:title="Meetings" />
+                    android:title="@string/prompt_meetings" />
             </menu>
         </item>
     </group>
     <group android:checkableBehavior="single" android:id="@+id/group2">
-        <item android:title="Account Controls" android:id="@+id/connected_users_id">
+        <item android:title="@string/title_account" android:id="@+id/connected_users_id">
             <menu>
                 <item
                     android:id="@+id/nav_settings"
                     android:icon="@drawable/settings"
-                    android:title="Settings" />
+                    android:title="@string/prompt_settings" />
                 <item
                     android:id="@+id/nav_signout"
                     android:icon="@drawable/sign_out"
-                    android:title="Sign Out" />
+                    android:title="@string/prompt_signout" />
             </menu>
         </item>
     </group>

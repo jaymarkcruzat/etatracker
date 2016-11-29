@@ -15,5 +15,5 @@
     <color name="skyblue">#2272CD</color>
     <color name="lightblue">#62B2FF</color>
     <color name="error">#FF0000</color>
-    <color name="message">#303F9F</color>
+    <color name="message">#000000</color>
 </resources>
