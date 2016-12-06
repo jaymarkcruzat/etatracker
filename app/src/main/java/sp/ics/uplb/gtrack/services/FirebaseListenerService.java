@@ -157,7 +157,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
     @Override
     public void onLocationChanged(final Location location) {
-        AsyncTask sendLocation = new AsyncTask() {
+        new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
                 sendLocationData(location);
@@ -369,10 +369,10 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
     private void sendNotification(String message) {
         if (builder!=null) {
-            builder.setStyle(new NotificationCompat.BigTextStyle().bigText(message));
             builder.setTicker(message);
             builder.setSubText(message);
             builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+            Logger.print("sendNotification");
             startForeground(R.string.app_name, builder.build());
         }
     }
