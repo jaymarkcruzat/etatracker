@@ -118,6 +118,21 @@ public class MenusFragment extends Fragment {
         }
     }
 
+    private void setEnableMapComponents(boolean value) {
+        try {
+            mainActivity.googleMap.getUiSettings().setAllGesturesEnabled(value);
+            mainActivity.myLocationView.setClickable(value);
+            mainActivity.markerButtonSet.setEnabled(value);
+            mainActivity.markerButtonDelete.setEnabled(value);
+            mainActivity.markerButtonEdit.setEnabled(value);
+            mainActivity.markerButtonMove.setEnabled(value);
+            mainActivity.markerButtonShare.setEnabled(value);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private View.OnClickListener clickListener = new View.OnClickListener() {
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         @Override
@@ -166,11 +181,13 @@ public class MenusFragment extends Fragment {
                     } else if (status.contains(Constants.STATUS_ERROR))
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                     }
+                    setEnableMapComponents(true);
                     }
                     @Override
                     protected void onProgressUpdate(Object[] values) {
                     super.onProgressUpdate(values);
                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
+                    setEnableMapComponents(false);
                     }
                     @Override
                     protected Object doInBackground(Object[] params) {

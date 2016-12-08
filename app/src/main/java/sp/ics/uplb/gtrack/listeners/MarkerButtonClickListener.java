@@ -55,6 +55,21 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
         this.statusBarMain = (TextView) mainActivity.findViewById(R.id.status_bar_main);
     }
 
+    private void setEnableMapComponents(boolean value) {
+        try {
+            mainActivity.googleMap.getUiSettings().setAllGesturesEnabled(value);
+            mainActivity.myLocationView.setClickable(value);
+            mainActivity.markerButtonSet.setEnabled(value);
+            mainActivity.markerButtonDelete.setEnabled(value);
+            mainActivity.markerButtonEdit.setEnabled(value);
+            mainActivity.markerButtonMove.setEnabled(value);
+            mainActivity.markerButtonShare.setEnabled(value);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     @Override
     public void onClick(final View v) {
         switch (v.getId()) {
@@ -88,11 +103,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
+                                    setEnableMapComponents(true);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
+                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -142,11 +159,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
+                                    setEnableMapComponents(true);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
+                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -205,11 +224,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
+                                    setEnableMapComponents(true);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
+                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -267,11 +288,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         else if (status.toString().contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(context, R.color.error), Common.getErrorMessage(context, status.toString()));
                                     }
+                                    setEnableMapComponents(true);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(context, R.color.message), values[0].toString());
+                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -341,11 +364,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
+                                    setEnableMapComponents(true);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
+                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {

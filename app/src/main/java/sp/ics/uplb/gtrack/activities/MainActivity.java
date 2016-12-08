@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public SQLiteDatabaseHandler db = null;
     private LocationBroadcastReceiver locationBroadcastReceiver = null;
     private IntentFilter locationBroadcastIntentFilter = null;
-    private SupportMapFragment mapFragment = null;
+    public SupportMapFragment mapFragment = null;
     public LatLng currentLocation = null;
     public ArrayList<Marker> markersList = new ArrayList<Marker>();
     public boolean markersLoaded = false;
