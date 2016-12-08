@@ -149,7 +149,7 @@ public class MenusFragment extends Fragment {
                 public void onClick(final DialogInterface dialog, int id) {
                 final String markerTitle = ((EditText) newMarkerView.findViewById(R.id.markerTitle)).getText().toString();
                 final String markerDescription = ((EditText) newMarkerView.findViewById(R.id.markerDescription)).getText().toString();
-                if (!mainActivity.containsMarker(markerTitle)) {
+                //if (!mainActivity.containsMarker(markerTitle)) {
                     faMenu.close(true);
                     final LatLng target = mainActivity.googleMap.getCameraPosition().target;
                     AsyncTask createMarkerTask = new AsyncTask() {
@@ -196,14 +196,14 @@ public class MenusFragment extends Fragment {
                     }
                     };
                     createMarkerTask.execute((Void)null);
-                } else {
+                /*} else {
                     new AlertDialog.Builder(getContext()).setMessage(getString(R.string.error_duplicate_marker_not_allowed)).setPositiveButton(Constants.GLOBAL_OK, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             v.performClick();
                         }
                 }).show();
-                }
+                }*/
                 }
                 }).setNegativeButton(Constants.GLOBAL_CANCEL, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
