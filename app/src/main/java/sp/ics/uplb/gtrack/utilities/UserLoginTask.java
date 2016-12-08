@@ -43,7 +43,7 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         String link, data = null;
-        if (Common.isGPSEnabled(loginActivity)) {
+
             link=loginActivity.getString(R.string.server_protocol) + loginActivity.getString(R.string.server_ip) + "/" + loginActivity.getString(R.string.app_name) + "/" + loginActivity.getString(R.string.php_index);
             try {
                 data = URLEncoder.encode(Constants.HTTP_POST_USERNAME,   loginActivity.getString(R.string.encrypt_encoding))  + "=" + URLEncoder.encode(email.split("@")[0], loginActivity.getString(R.string.encrypt_encoding)) +"&"+
@@ -65,8 +65,7 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-        else status = Constants.ERROR_GPS_DISABLED;
+
         return true;
     }
 
