@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -36,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import sp.ics.uplb.gtrack.R;
+import sp.ics.uplb.gtrack.services.FirebaseListenerService;
 
 public class Common {
 
@@ -101,6 +103,18 @@ public class Common {
             return (exitValue == 0);
         } catch (IOException e) { e.printStackTrace(); }
         catch (InterruptedException e) { e.printStackTrace(); }
+        return false;
+    }
+
+    public static boolean  isTargetLocation(FirebaseListenerService mService, Marker marker) {
+        if (mService!=null) {
+            LatLng position = marker.getPosition();
+            LatLng target = mService.targetLatLng;
+            if (target!=null) {
+                if (target.latitude == position.latitude && target.longitude == position.longitude)
+                    return true;
+            }
+        }
         return false;
     }
 

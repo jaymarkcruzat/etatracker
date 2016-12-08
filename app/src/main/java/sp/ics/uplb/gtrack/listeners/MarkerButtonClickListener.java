@@ -3,7 +3,6 @@ package sp.ics.uplb.gtrack.listeners;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -13,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -21,7 +19,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,16 +30,10 @@ import sp.ics.uplb.gtrack.R;
 import sp.ics.uplb.gtrack.activities.MainActivity;
 import sp.ics.uplb.gtrack.controllers.Contact;
 import sp.ics.uplb.gtrack.controllers.Markers;
-import sp.ics.uplb.gtrack.controllers.Meeting;
-import sp.ics.uplb.gtrack.controllers.Request;
-import sp.ics.uplb.gtrack.controllers.SQLiteDatabaseHandler;
 import sp.ics.uplb.gtrack.controllers.SharedPref;
-import sp.ics.uplb.gtrack.controllers.User;
-import sp.ics.uplb.gtrack.services.FirebaseListenerService;
 import sp.ics.uplb.gtrack.utilities.Common;
 import sp.ics.uplb.gtrack.utilities.Constants;
 import sp.ics.uplb.gtrack.utilities.FirebaseAction;
-import sp.ics.uplb.gtrack.utilities.JSONParser;
 import sp.ics.uplb.gtrack.utilities.Logger;
 
 public class MarkerButtonClickListener implements Button.OnClickListener {
@@ -219,7 +210,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             }
                                             mainActivity.markerButtonSet.setText(isSet ? Constants.BUTTON_TEXT_UNSET : Constants.BUTTON_TEXT_SET);
                                             selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(isSet ? R.drawable.target_marker : R.drawable.marker));
-                                            sendTargetLocationIntent(isSet,selectedMarker);
+
+                                            if (mainActivity.mService!=null) {
+                                                if (isSet) mainActivity.mService.setTargetLocation(selectedMarker.getTitle(),selectedMarker.getPosition());
+                                                else mainActivity.mService.setTargetLocation(null,null);
+                                            }
+
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(isSet ? R.string.message_meeting_point_set : R.string.message_meeting_point_unset));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
@@ -392,14 +388,5 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                 break;
             }
         }
-    }
-
-    private void sendTargetLocationIntent(boolean isSet, Marker selectedMarker) {
-        Intent sendTargetIntent = new Intent();
-        sendTargetIntent.setAction(Constants.INTENT_SET_TARGET);
-        sendTargetIntent.putExtra(Constants.TARGET_LOCATION, selectedMarker.getTitle());
-        sendTargetIntent.putExtra(Constants.TARGET_LOCATION_LATITUDE, String.valueOf(selectedMarker.getPosition().latitude));
-        sendTargetIntent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, String.valueOf(selectedMarker.getPosition().longitude));
-        mainActivity.sendBroadcast(sendTargetIntent);
     }
 }

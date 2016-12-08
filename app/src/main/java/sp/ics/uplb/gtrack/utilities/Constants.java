@@ -11,7 +11,6 @@ public class Constants {
 
     public static final String INTENT_DRAW_GPS                              = "sp.ics.uplb.gtrack.DRAW_GPS_INTENT";
     public static final String INTENT_DISCONNECT                            = "sp.ics.uplb.gtrack.DISCONNECT";
-    public static final String INTENT_SET_TARGET                            = "sp.ics.uplb.gtrack.SET_TARGET";
 
     public static final String GLOBAL_BLANK                                 = "";
     public static final String GLOBAL_SPACE                                 = " ";

@@ -62,14 +62,6 @@
                 </action>
                 <action android:name="sp.ics.uplb.gtrack.DISCONNECT" >
                 </action>
-                <action android:name="sp.ics.uplb.gtrack.SET_TARGET" >
-                </action>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".services.FirebaseListenerService$FirebaseBroadcastReceiver">
-            <intent-filter>
-                <action android:name="sp.ics.uplb.gtrack.SET_TARGET" >
-                </action>
             </intent-filter>
         </receiver>
     </application>

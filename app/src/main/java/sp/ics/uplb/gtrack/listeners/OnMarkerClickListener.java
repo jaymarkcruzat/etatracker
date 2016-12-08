@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.Marker;
 import sp.ics.uplb.gtrack.R;
 import sp.ics.uplb.gtrack.activities.MainActivity;
 import sp.ics.uplb.gtrack.controllers.SharedPref;
+import sp.ics.uplb.gtrack.utilities.Common;
 import sp.ics.uplb.gtrack.utilities.Constants;
 
 public class OnMarkerClickListener implements GoogleMap.OnMarkerClickListener {
@@ -20,12 +21,14 @@ public class OnMarkerClickListener implements GoogleMap.OnMarkerClickListener {
         this.mainActivity = mainActivity;
     }
 
-    @Override
 
+
+    @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.getTitle()!=null) {
-            String target = SharedPref.getString(mainActivity.getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
-            mainActivity.markerButtonSet.setText(target==null||!target.equals(marker.getTitle()) ? Constants.BUTTON_TEXT_SET : Constants.BUTTON_TEXT_UNSET);
+
+            boolean isTarget = Common.isTargetLocation(mainActivity.mService,marker);
+            mainActivity.markerButtonSet.setText(!isTarget ? Constants.BUTTON_TEXT_SET : Constants.BUTTON_TEXT_UNSET);
             mainActivity.markerButtonEdit.setVisibility(View.VISIBLE);
             mainActivity.markerButtonDelete.setVisibility(View.VISIBLE);
             mainActivity.markerButtonSet.setVisibility(View.VISIBLE);
@@ -33,6 +36,7 @@ public class OnMarkerClickListener implements GoogleMap.OnMarkerClickListener {
             mainActivity.markerButtonMove.setVisibility(View.VISIBLE);
             mainActivity.selectedMarker = marker;
             return false;
+
         }
         return true;
     }

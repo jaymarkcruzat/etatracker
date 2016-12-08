@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.media.RingtoneManager;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -29,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,12 +60,27 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     private ArrayList connectedPeers = new ArrayList();
     private ArrayList ignoreList = new ArrayList();
     private SharedPreferences sharedPreference = null;
-    private SharedPreferences.OnSharedPreferenceChangeListener spChangeListener = null;
-    private FirebaseBroadcastReceiver firebaseBroadcastReceiver = null;
-    private IntentFilter firebaseIntentFilter = null;
-    public static String targetLocation = null;
-    public static String targetLocationLatitude = null;
-    public static String targetLocationLongitude = null;
+
+    public String targetName = null;
+    public LatLng targetLatLng = null;
+
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public FirebaseListenerService getService() {
+            return FirebaseListenerService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    public void setTargetLocation(String name,LatLng target) {
+        targetName = name;
+        targetLatLng = target;
+    }
 
     synchronized void buildGoogleApiClient() {
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
@@ -71,23 +88,9 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
     public void onDestroy() {
         stopForeground(true);
         googleApiClient.disconnect();
-        if (sharedPreference!=null && spChangeListener!=null) {
-            sharedPreference.unregisterOnSharedPreferenceChangeListener(spChangeListener);
-            sharedPreference = null;
-            spChangeListener = null;
-        }
-        if (firebaseBroadcastReceiver!=null) {
-            unregisterReceiver(firebaseBroadcastReceiver);
-            firebaseBroadcastReceiver=null;
-        }
     }
 
     private void sendLocationData(Location location) {
@@ -107,7 +110,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
             return;
         }
 
-        Logger.print("targetLocation: "+targetLocation+" targetLocationLatitude:"+targetLocationLatitude+" targetLocationLongitude:"+targetLocationLongitude);
+        Logger.print("targetLocation: "+targetName+" :"+targetLatLng);
 
         Intent intentGPS = new Intent();
         intentGPS.putExtra(Constants.KEY_CURRENT_GPS_LATITUDE, String.valueOf(latitude));
@@ -200,9 +203,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         buildGoogleApiClient();
 
         sharedPreference = SharedPref.getInstance(this);
-        if (firebaseBroadcastReceiver==null) firebaseBroadcastReceiver = new FirebaseBroadcastReceiver();
-        if (firebaseIntentFilter==null) firebaseIntentFilter=new IntentFilter();
-        registerReceiver(firebaseBroadcastReceiver,firebaseIntentFilter);
 
         if (intent!=null) {
             Bundle params = intent.getExtras();
@@ -399,26 +399,6 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-    }
-
-    public static void updateTargetLocation(String location,String latitude, String longitude) {
-        Logger.print("updateTargetLocation");
-        targetLocation = location;
-        targetLocationLatitude = latitude;
-        targetLocationLongitude = longitude;
-    }
-
-    public static class FirebaseBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (action.equals(Constants.INTENT_SET_TARGET)) {
-                updateTargetLocation(intent.getStringExtra(Constants.TARGET_LOCATION),
-                        intent.getStringExtra(Constants.TARGET_LOCATION_LATITUDE),
-                        intent.getStringExtra(Constants.TARGET_LOCATION_LONGITUDE));
-            }
-        }
     }
 
 }

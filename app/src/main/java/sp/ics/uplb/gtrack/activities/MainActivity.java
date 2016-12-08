@@ -2,14 +2,17 @@ package sp.ics.uplb.gtrack.activities;
 
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Polyline polyline = null;
     public Circle circle = null;
     public Marker currentUserIcon = null;
-    public LatLng targetLocationLatLng = null;
+    public Marker targetLocationMarker = null;
     public ImageView myLocationView = null;
 
     public HashMap<String,Button> connectedUsersButtons= null;
@@ -124,6 +127,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static MainActivity getInstance() {
         return mainActivityRunningInstance;
     }
+
+    public FirebaseListenerService mService;
+    boolean mBound = false;
+
+    ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            FirebaseListenerService.LocalBinder binder = (FirebaseListenerService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,21 +226,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ((MenusFragment)fragment).setMainActivity(this);
         fragmentTransaction.replace(R.id.fragment, fragment).commit();
 
-        String target = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
-        String targetLatitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LATITUDE, null);
-        String targetLongitude = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION_LONGITUDE, null);
+        Intent intent = new Intent(getApplicationContext(), FirebaseListenerService.class);
         if (!isServiceActive(FirebaseListenerService.class)) {
-            Intent intent = new Intent(getApplicationContext(), FirebaseListenerService.class);
+
             intent.putExtra(Constants.USER_EMAIL, emailAddress);
             intent.putExtra(Constants.USER_NAME, userName);
             intent.putExtra(Constants.USER_CODE, userCode);
             intent.putExtra(Constants.USER_FIREBASEID, firebaseid);
-            intent.putExtra(Constants.TARGET_LOCATION, target);
-            intent.putExtra(Constants.TARGET_LOCATION_LATITUDE, targetLatitude);
-            intent.putExtra(Constants.TARGET_LOCATION_LONGITUDE, targetLongitude);
             startService(intent);
+
         }
-        if (!Common.isNull(target) && !Common.isNull(targetLatitude) && !Common.isNull(targetLongitude)) targetLocationLatLng = new LatLng(Double.parseDouble(targetLatitude),Double.parseDouble(targetLongitude));
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
     }
 
@@ -267,6 +284,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (selectedMarker!=null) selectedMarker.remove();
         if (currentUserIcon!=null) currentUserIcon.remove();
         googleMap.clear();
+
+        //unbind service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+
         super.onDestroy();
     }
 
@@ -320,8 +344,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 editor.remove(Constants.USER_FIREBASEID);
                                 editor.clear();
                                 editor.apply();
+
+                                //stop service
                                 Intent notificationServiceIntent = new Intent(getApplicationContext(), FirebaseListenerService.class);
                                 stopService(notificationServiceIntent);
+
                                 finish();
                                 Intent loginActivity = new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(loginActivity);
@@ -383,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
                 if (status != null) {
-                    String target = SharedPref.getString(getApplicationContext(), Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
                     if (status.equals(Constants.MESSAGE_SELECT_SUCCESSFUL)) {
                         String result = null;
                         try {
@@ -391,6 +417,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
                         JSONArray jsonArray = JSONParser.getJSONArray(result);
                         for (int i = 0; i < jsonArray.length(); i++) {
                             try {
@@ -404,10 +431,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 double latitude = Double.parseDouble(coordinate[0].trim());
                                 double longitude = Double.parseDouble(coordinate[1].trim());
                                 LatLng latLng = new LatLng(latitude, longitude);
+
                                 Marker newMarker = googleMap.addMarker(new MarkerOptions().position(latLng).title(markerTitle).snippet(markerDescription));
+                                boolean isTarget = Common.isTargetLocation(mService, newMarker);
                                 newMarker.setDraggable(false);
                                 newMarker.showInfoWindow();
-                                markerButtonSet.setText(target==null||!target.equals(markerTitle) ? Constants.BUTTON_TEXT_SET : Constants.BUTTON_TEXT_UNSET);
+
+                                Logger.print(newMarker.getTitle()+" 1isTarget="+isTarget);
+
+                                markerButtonSet.setText(!isTarget ? Constants.BUTTON_TEXT_SET : Constants.BUTTON_TEXT_UNSET);
                                 markerButtonEdit.setVisibility(View.VISIBLE);
                                 markerButtonDelete.setVisibility(View.VISIBLE);
                                 markerButtonSet.setVisibility(View.VISIBLE);
@@ -518,7 +550,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.setMyLocationEnabled(false);
 
-        googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(), this));
+        googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(),this));
         googleMap.setOnMarkerClickListener(new OnMarkerClickListener(this));
         googleMap.setOnInfoWindowCloseListener(new OnMarkerCloseListener(this));
         googleMap.setOnCameraChangeListener(new OnCameraChangeListener(this));
@@ -935,12 +967,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     }
                                     if (mainActivityInstance.currentLocation!=null) {
                                         mainActivityInstance.redrawCurrentUserIcon(mainActivityInstance.currentLocation);
-                                        if (mainActivityInstance.targetLocationLatLng!=null && mainActivityInstance.markersLoaded) {
-                                            ArrayList<LatLng> route = new ArrayList<>();
-                                            route.add(mainActivityInstance.currentLocation);
-                                            route.add(mainActivityInstance.targetLocationLatLng);
-                                            mainActivityInstance.redrawPolyline(route);
-                                        }
                                     }
                                 }
                             } else mainActivityInstance.updateUserPosition(latitude, longitude, userCode, userName, speed, eta, timeStamp, targetLocation);

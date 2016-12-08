@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import sp.ics.uplb.gtrack.R;
 import sp.ics.uplb.gtrack.activities.MainActivity;
 import sp.ics.uplb.gtrack.controllers.SharedPref;
+import sp.ics.uplb.gtrack.utilities.Common;
 import sp.ics.uplb.gtrack.utilities.Constants;
 import sp.ics.uplb.gtrack.utilities.Logger;
 
@@ -38,10 +39,8 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         tvTitle.setText(marker.getTitle());
         TextView tvSnippet = ((TextView)contentsView.findViewById(R.id.snippet));
         tvSnippet.setText(marker.getSnippet());
-        if (marker.getTitle()!=null) {
-            String target = SharedPref.getString(context, Constants.SHARED_PREF, Constants.TARGET_LOCATION, null);
-            marker.setIcon(BitmapDescriptorFactory.fromResource(target==null||!target.equals(marker.getTitle()) ? R.drawable.marker : R.drawable.target_marker));
-        }
+        boolean isTarget = Common.isTargetLocation(context.mService,marker);
+        marker.setIcon(BitmapDescriptorFactory.fromResource(!isTarget ? R.drawable.marker : R.drawable.target_marker));
         return contentsView;
     }
 
