@@ -89,6 +89,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                                     break;
                                                 }
                                             }
+
                                             if (mainActivity.selectedMarker!=null) {
                                                 if (mainActivity.mService != null) {
                                                     if (Common.isTargetLocation(mainActivity.mService, mainActivity.selectedMarker))
@@ -96,6 +97,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                                 }
                                                 mainActivity.selectedMarker.remove();
                                             }
+
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_deleted));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
@@ -151,14 +153,14 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             String markerDescription = ((EditText) newMarkerView.findViewById(R.id.markerDescription)).getText().toString();
                                             mainActivity.selectedMarker.setTitle(markerTitle);
                                             mainActivity.selectedMarker.setSnippet(markerDescription);
-                                            mainActivity.selectedMarker.showInfoWindow();
-                                            if (mainActivity.selectedMarker!=null) {
-                                                if (mainActivity.mService != null) {
-                                                    if (Common.isTargetLocation(mainActivity.mService, mainActivity.selectedMarker))
-                                                        mainActivity.mService.setTargetLocation(markerTitle, mainActivity.selectedMarker.getPosition());
+
+                                            if (mainActivity.mService!=null && mainActivity.selectedMarker!=null) {
+                                                if (Common.isTargetLocation(mainActivity.mService,mainActivity.selectedMarker)) {
+                                                    mainActivity.mService.setTargetLocation(markerTitle,mainActivity.selectedMarker.getPosition());
                                                 }
-                                                mainActivity.selectedMarker.remove();
                                             }
+
+                                            mainActivity.selectedMarker.showInfoWindow();
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_updated));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
@@ -360,15 +362,22 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                         if (status.equals(Constants.MESSAGE_UPDATE_SUCCESSFUL)) {
                                             final String markerTitle = mainActivity.selectedMarker.getTitle();
                                             final String markerDescription = mainActivity.selectedMarker.getSnippet();
+
+                                            if (mainActivity.mService!=null && mainActivity.selectedMarker!=null) {
+                                                if (Common.isTargetLocation(mainActivity.mService,mainActivity.selectedMarker)) {
+                                                    mainActivity.mService.setTargetLocation(markerTitle,target);
+                                                }
+                                            }
+
                                             mainActivity.selectedMarker.remove();
                                             Marker marker = mainActivity.googleMap.addMarker(new MarkerOptions().position(target).title(markerTitle).snippet(markerDescription));
-                                            marker.showInfoWindow();
                                             mainActivity.markerButtonEdit.setVisibility(View.VISIBLE);
                                             mainActivity.markerButtonDelete.setVisibility(View.VISIBLE);
                                             mainActivity.markerButtonSet.setVisibility(View.VISIBLE);
                                             mainActivity.markerButtonShare.setVisibility(View.VISIBLE);
                                             mainActivity.markerButtonMove.setVisibility(View.VISIBLE);
                                             mainActivity.selectedMarker = marker;
+                                            marker.showInfoWindow();
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_moved_success));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
