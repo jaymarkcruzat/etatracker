@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.Status;
@@ -117,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Polyline polyline = null;
     public Circle circle = null;
     public Marker currentUserIcon = null;
-    public Marker targetLocationMarker = null;
     public ImageView myLocationView = null;
+    public View progressBar = null;
 
     public HashMap<String,Button> connectedUsersButtons= null;
     public HashMap<String,EditText> connectedUsersTextPanel= null;
@@ -176,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         markerButtonShare.setOnClickListener(markerButtonClickListener);
         markerButtonMove.setOnClickListener(markerButtonClickListener);
         statusBarMain = (TextView)findViewById(R.id.status_bar_main);
+        progressBar = (View) findViewById(R.id.status_progress);
         params = getIntent().getExtras();
         contactListDetails = new HashMap<String,JSONObject>();
         connectedUsersList = new ArrayList();
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        Common.showProgress(getApplicationContext(), progressBar, true);
         if (params !=null && sharedPreference.getString(Constants.USER_EMAIL,null)==null) {
             editor.putString(Constants.USER_EMAIL, emailAddress  = params.getString(Constants.USER_EMAIL));
             editor.putString(Constants.USER_NAME, userName  = params.getString(Constants.USER_NAME));
@@ -358,10 +361,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             } else if (status.contains(Constants.STATUS_ERROR))
                                 Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.error), Common.getErrorMessage(getApplicationContext(),status));
                         }
+                        Common.showProgress(getApplicationContext(), progressBar, false);
                     }
                     @Override
                     protected void onProgressUpdate(Object[] values) {
                         super.onProgressUpdate(values);
+                        Common.showProgress(getApplicationContext(), progressBar, true);
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), values[0].toString());
                     }
                     @Override
@@ -464,10 +469,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         initializeMap();
                     }
                 }
+                Common.showProgress(getApplicationContext(),progressBar,false);
             }
             @Override
             protected void onProgressUpdate(Object[] values) {
                 super.onProgressUpdate(values);
+                Common.showProgress(getApplicationContext(),progressBar,true);
                 Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), values[0].toString());
             }
             @Override
@@ -514,20 +521,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 e.printStackTrace();
                             }
                         }
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name)));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), Common.getGeoLocationName(getApplicationContext(),currentLocation.latitude,currentLocation.longitude)));
                         contactsLoaded=true;
                     } else if (status.equals(Constants.MESSAGE_SELECT_EMPTY)) {
                         //Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_no_contacts));
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name)));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), Common.getGeoLocationName(getApplicationContext(),currentLocation.latitude,currentLocation.longitude)));
                     } else if (status.contains(Constants.STATUS_ERROR)) {
                         //ommon.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.error), Common.getErrorMessage(getApplicationContext(), status));
                         initializeContacts();
                     }
                 }
+                Common.showProgress(getApplicationContext(), progressBar, false);
             }
             @Override
             protected void onProgressUpdate(Object[] values) {
                 super.onProgressUpdate(values);
+                Common.showProgress(getApplicationContext(), progressBar, true);
                 Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), values[0].toString());
             }
             @Override
@@ -673,11 +682,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        Common.showProgress(getApplicationContext(), progressBar, false);
                     }
 
                     @Override
                     protected void onProgressUpdate(Object[] values) {
                         super.onProgressUpdate(values);
+                        Common.showProgress(getApplicationContext(), progressBar, true);
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), values[0].toString());
                     }
 
@@ -753,10 +764,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 catch (JSONException ex) {
                 }
+                Common.showProgress(getApplicationContext(), progressBar, false);
             }
             @Override
             protected void onProgressUpdate(Object[] values) {
                 super.onProgressUpdate(values);
+                Common.showProgress(getApplicationContext(), progressBar, true);
                 Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), values[0].toString());
             }
             @Override

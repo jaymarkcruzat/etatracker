@@ -182,10 +182,12 @@ public class MenusFragment extends Fragment {
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                     }
                     setEnableMapComponents(true);
+                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                     }
                     @Override
                     protected void onProgressUpdate(Object[] values) {
                     super.onProgressUpdate(values);
+                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                     setEnableMapComponents(false);
                     }
@@ -331,10 +333,12 @@ public class MenusFragment extends Fragment {
                             }else
                             if (status.contains(Constants.STATUS_ERROR)) Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity, status));
                             }
+                            Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                             }
                             @Override
                             protected void onProgressUpdate (Object[]values){
                             super.onProgressUpdate(values);
+                            Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                             }
                             @Override
@@ -348,10 +352,12 @@ public class MenusFragment extends Fragment {
                             if (status.contains(Constants.STATUS_ERROR))
                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getActivity().getApplicationContext(), R.color.error), Common.getErrorMessage(getActivity().getApplicationContext(), status));
                         }
+                        Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                         }
                         @Override
                         protected void onProgressUpdate (Object[]values){
                         super.onProgressUpdate(values);
+                        Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getActivity().getApplicationContext(), R.color.message), values[0].toString());
                         }
                         @Override
@@ -370,10 +376,12 @@ public class MenusFragment extends Fragment {
                     } else if (status.contains(Constants.STATUS_ERROR))
                         Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getActivity().getApplicationContext(), R.color.error), Common.getErrorMessage(getActivity().getApplicationContext(), status));
                     }
+                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                     }
                     @Override
                     protected void onProgressUpdate (Object[]values){
                     super.onProgressUpdate(values);
+                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getActivity().getApplicationContext(), R.color.message), values[0].toString());
                     }
                     @Override

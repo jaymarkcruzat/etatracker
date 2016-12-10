@@ -103,10 +103,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
                                     setEnableMapComponents(true);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                                 }
                                 @Override
@@ -166,10 +168,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
                                     setEnableMapComponents(true);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                                 }
                                 @Override
@@ -236,10 +240,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
                                     setEnableMapComponents(true);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                                 }
                                 @Override
@@ -300,10 +306,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(context, R.color.error), Common.getErrorMessage(context, status.toString()));
                                     }
                                     setEnableMapComponents(true);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(context, R.color.message), values[0].toString());
                                 }
                                 @Override
@@ -383,10 +391,12 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
                                     }
                                     setEnableMapComponents(true);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, false);
                                 }
                                 @Override
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
+                                    Common.showProgress(mainActivity.getApplicationContext(), mainActivity.progressBar, true);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
                                 }
                                 @Override
