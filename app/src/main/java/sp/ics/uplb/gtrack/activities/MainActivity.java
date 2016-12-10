@@ -84,6 +84,7 @@ import sp.ics.uplb.gtrack.utilities.Logger;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
+    public Toolbar toolbar = null;
     public GoogleMap googleMap = null;
     public SharedPreferences sharedPreference = null;
     public SharedPreferences.Editor editor = null;
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         mainActivityRunningInstance = this;
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.mtoolbar);
         setSupportActionBar(toolbar);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.gmap);

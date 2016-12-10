@@ -2,7 +2,6 @@ package sp.ics.uplb.gtrack.listeners;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -30,7 +29,6 @@ import sp.ics.uplb.gtrack.R;
 import sp.ics.uplb.gtrack.activities.MainActivity;
 import sp.ics.uplb.gtrack.controllers.Contact;
 import sp.ics.uplb.gtrack.controllers.Markers;
-import sp.ics.uplb.gtrack.controllers.SharedPref;
 import sp.ics.uplb.gtrack.utilities.Common;
 import sp.ics.uplb.gtrack.utilities.Constants;
 import sp.ics.uplb.gtrack.utilities.FirebaseAction;
@@ -50,6 +48,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
         try {
             mainActivity.googleMap.getUiSettings().setAllGesturesEnabled(value);
             mainActivity.myLocationView.setClickable(value);
+            mainActivity.myLocationView.setEnabled(value);
             mainActivity.markerButtonSet.setEnabled(value);
             mainActivity.markerButtonDelete.setEnabled(value);
             mainActivity.markerButtonEdit.setEnabled(value);
@@ -72,6 +71,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                     alertDialogBuilder.setView(deleteMarkerView);
                     alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_YES, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            setEnableMapComponents(false);
                             final String title = mainActivity.selectedMarker.getTitle();
                             final String userCode = mainActivity.userCode;
                             AsyncTask deleteMarkerTask = new AsyncTask() {
@@ -89,7 +89,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                                     break;
                                                 }
                                             }
-                                            mainActivity.selectedMarker.remove();
+                                            if (mainActivity.selectedMarker!=null) {
+                                                if (mainActivity.mService != null) {
+                                                    if (Common.isTargetLocation(mainActivity.mService, mainActivity.selectedMarker))
+                                                        mainActivity.mService.setTargetLocation(null, null);
+                                                }
+                                                mainActivity.selectedMarker.remove();
+                                            }
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_deleted));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
@@ -100,7 +106,6 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
-                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -130,6 +135,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                     ((EditText) newMarkerView.findViewById(R.id.markerDescription)).setText(mainActivity.selectedMarker.getSnippet());
                     alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_OK, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            setEnableMapComponents(false);
                             final String markerTitle = ((EditText) newMarkerView.findViewById(R.id.markerTitle)).getText().toString();
                             final String markerDescription = ((EditText) newMarkerView.findViewById(R.id.markerDescription)).getText().toString();
                             final String oldTitle = mainActivity.selectedMarker.getTitle();
@@ -146,6 +152,13 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             mainActivity.selectedMarker.setTitle(markerTitle);
                                             mainActivity.selectedMarker.setSnippet(markerDescription);
                                             mainActivity.selectedMarker.showInfoWindow();
+                                            if (mainActivity.selectedMarker!=null) {
+                                                if (mainActivity.mService != null) {
+                                                    if (Common.isTargetLocation(mainActivity.mService, mainActivity.selectedMarker))
+                                                        mainActivity.mService.setTargetLocation(markerTitle, mainActivity.selectedMarker.getPosition());
+                                                }
+                                                mainActivity.selectedMarker.remove();
+                                            }
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), mainActivity.getString(R.string.message_marker_updated));
                                         } else if (status.contains(Constants.STATUS_ERROR))
                                             Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.error), Common.getErrorMessage(mainActivity,status));
@@ -156,7 +169,6 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
-                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -188,6 +200,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                     alertDialogBuilder.setView(setMarkerView);
                     alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_YES, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            setEnableMapComponents(false);
                             final String title = selectedMarker.getTitle();
                             final String userCode = mainActivity.userCode;
                             AsyncTask setMarkerTask = new AsyncTask() {
@@ -226,7 +239,6 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
-                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -268,6 +280,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                     participantsTextView.setAdapter(adapter);
                     alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_SHARE, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            setEnableMapComponents(false);
                             final String share_recipient = participantsTextView.getText().toString();
                             final Context context = v.getContext();
                             final String marker_title = mainActivity.selectedMarker.getTitle();
@@ -290,7 +303,6 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(context, R.color.message), values[0].toString());
-                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
@@ -330,6 +342,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                     alertDialogBuilder.setView(setMarkerView);
                     alertDialogBuilder.setCancelable(false).setPositiveButton(Constants.GLOBAL_YES, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                            setEnableMapComponents(false);
                             final LatLng target = mainActivity.googleMap.getCameraPosition().target;
                             final String title = mainActivity.selectedMarker.getTitle();
                             final String userCode = mainActivity.userCode;
@@ -366,7 +379,6 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                 protected void onProgressUpdate(Object[] values) {
                                     super.onProgressUpdate(values);
                                     Common.updateStatusBar(statusBarMain, ContextCompat.getColor(mainActivity, R.color.message), values[0].toString());
-                                    setEnableMapComponents(false);
                                 }
                                 @Override
                                 protected Object doInBackground(Object[] params) {
