@@ -58,6 +58,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -513,10 +514,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 e.printStackTrace();
                             }
                         }
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_contacts_retrieved));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name)));
                         contactsLoaded=true;
                     } else if (status.equals(Constants.MESSAGE_SELECT_EMPTY)) {
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_no_contacts));
+                        //Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_no_contacts));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name)));
                     } else if (status.contains(Constants.STATUS_ERROR)) {
                         //ommon.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.error), Common.getErrorMessage(getApplicationContext(), status));
                         initializeContacts();
@@ -551,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.setMyLocationEnabled(false);
 
-        googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(),this));
+        googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(), this));
         googleMap.setOnMarkerClickListener(new OnMarkerClickListener(this));
         googleMap.setOnInfoWindowCloseListener(new OnMarkerCloseListener(this));
         googleMap.setOnCameraChangeListener(new OnCameraChangeListener(this));
@@ -887,7 +889,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             float tilt = mapTilt == null ? 30 : Float.parseFloat(mapTilt);
             float bearing = mapBearing == null ? 1 : Float.parseFloat(mapBearing);
             CameraPosition cameraPosition = new CameraPosition.Builder().target(target).zoom(zoom).tilt(tilt == 0 ? 30 : tilt).bearing(bearing == 0 ? 1 : bearing).build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 

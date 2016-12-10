@@ -136,6 +136,8 @@ public class Constants {
     public static final String TABLE_CONTACTS_LIST                          = "contacts_list";
     public static final String TABLE_NODE                                   = "node";
 
+    public static final String DATE_FORMAT_WELCOME_MESSAGE                  = "EEEE, MMMM dd, yyyy";
+
     public static final String KEY_ID                                       = "id";
     public static final String KEY_NAME                                     = "name";
     public static final String KEY_FIREBASEID                               = "firebaseid";

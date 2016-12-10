@@ -245,6 +245,11 @@ public class Common {
         return simpleDateFormat.format(date);
     }
 
+    public static String convertDateToString(Date date,String format) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
+    }
+
     public static Date convertStringToDate(String strDate) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         try {
