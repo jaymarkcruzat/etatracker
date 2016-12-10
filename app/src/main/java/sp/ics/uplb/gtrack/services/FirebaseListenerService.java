@@ -209,7 +209,16 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
             firebaseid = params.getString(Constants.USER_FIREBASEID);
             firebase = new Firebase(Constants.FIREBASE_APP + firebaseid);
             firebase.setPriority(Constants.FIREBASE_PRIORITY_HIGH);
-            if (builder==null) createUIForeground(intent);
+            if (builder==null) {
+                if (builder==null) {
+                    Intent mainActivity = new Intent(getApplicationContext(),MainActivity.class);
+                    mainActivity.putExtra(Constants.USER_EMAIL,      SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_EMAIL, null));
+                    mainActivity.putExtra(Constants.USER_NAME,       SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_NAME, null));
+                    mainActivity.putExtra(Constants.USER_CODE,       SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_CODE, null));
+                    mainActivity.putExtra(Constants.USER_FIREBASEID, SharedPref.getString(getApplicationContext(),Constants.SHARED_PREF,Constants.USER_FIREBASEID, null));
+                    createUIForeground(mainActivity);
+                }
+            }
             userCode = (String) params.get(Constants.USER_CODE);
             userName = (String) params.get(Constants.USER_EMAIL);
             userFirebaseId = (String) params.get(Constants.USER_FIREBASEID);
