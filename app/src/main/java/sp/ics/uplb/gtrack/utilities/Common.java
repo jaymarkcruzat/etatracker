@@ -263,4 +263,46 @@ public class Common {
         return Calendar.getInstance().getTime();
     }
 
+    public static String getGeoLocationName(Context context, double latitude, double longitude) {
+
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        List<Address> addresses = null;
+
+        String address = null;
+        String city = null;
+        String state = null;
+        String country = null;
+        String postalCode = null;
+
+        try {
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (addresses!=null && addresses.size()>0) {
+            address = addresses.get(0).getAddressLine(0);
+            city = addresses.get(0).getLocality();
+            state = addresses.get(0).getSubAdminArea();
+            country = addresses.get(0).getCountryName();
+            postalCode = addresses.get(0).getPostalCode();
+        }
+
+        if (address!=null && city!=null && address.equals(city)) address=null;
+        if (address!=null && state!=null && address.equals(state)) address=null;
+        if (address!=null && address.contains("Unnamed Rd")) address = null;
+        if (city!=null && state!=null && city.equals(state)) city=null;
+        if (state!=null && country!=null && state.equals(country)) state=null;
+
+        String completeAddress  =  (address==null ? "" : address) +
+                (address!=null && city!=null ?  ", " : "")+
+                (city==null ? "" : city)+
+                (city!=null && state!=null ?  ", " : "")+
+                (state==null ? "" : state)+
+                (state!=null && country!=null ?  ", " : "")+
+                (country==null ? "" : country)+" "+
+                (postalCode==null ? "" : postalCode);
+
+        return  completeAddress;
+    }
 }
