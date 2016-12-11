@@ -22,7 +22,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_main" />
-
+    <include layout="@layout/info_panel" />
     <include layout="@layout/quickaction" />
 
 </android.support.design.widget.CoordinatorLayout>

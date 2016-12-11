@@ -108,7 +108,7 @@
     <string name="message_signout_successful">Signout successful.</string>
     <string name="message_no_records_found">No Records Found.</string>
     <string name="message_loading_users_successful">Loading Users Successful</string>
-    <string name="message_welcome_user">Hi %1$s. Welcome to %3$s! Today is %2$s.  You are located at %4$s.</string>
+    <string name="message_welcome_user">Hi %1$s. Welcome to %3$s! Today is %2$s.  Current Address: %4$s.</string>
     <string name="message_marker_created">Marker has been created.</string>
     <string name="message_markers_retrieved">Markers are successfully retrieved.</string>
     <string name="message_marker_deleted">Marker has been deleted.</string>

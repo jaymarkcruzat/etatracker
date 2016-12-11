@@ -263,6 +263,15 @@ public class Common {
         return Calendar.getInstance().getTime();
     }
 
+    public static void updateInfoPanel(TextView infoPanel,int color,String message) {
+        if (infoPanel!=null) {
+            infoPanel.setTextColor(color);
+            infoPanel.setText(message);
+            infoPanel.setSelected(true);
+            infoPanel.invalidate();
+        }
+    }
+
     public static String getGeoLocationName(Context context, double latitude, double longitude) {
 
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());

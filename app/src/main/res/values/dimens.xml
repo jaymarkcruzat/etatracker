@@ -22,4 +22,8 @@
     <dimen name="status_bar_vertical_spacing">25dp</dimen>
     <dimen name="app_bar_height">100dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+
+    <dimen name="info_panel_height">35dp</dimen>
+    <dimen name="info_panel_width">200dp</dimen>
+    <dimen name="gmap_margin_top">57dp</dimen>
 </resources>

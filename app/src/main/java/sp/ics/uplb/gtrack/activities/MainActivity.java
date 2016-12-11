@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Button markerButtonMove = null;
     public Marker selectedMarker = null;
     public TextView statusBarMain = null;
+    public TextView infoPanel = null;
     public HashMap<String,JSONObject> contactListDetails = null;
     public ArrayList connectedUsersList = null;
     public float currentZoom = 15;
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public Marker currentUserIcon = null;
     public ImageView myLocationView = null;
     public View progressBar = null;
+    private String currentAddress = null;
 
     public HashMap<String,Button> connectedUsersButtons= null;
     public HashMap<String,EditText> connectedUsersTextPanel= null;
@@ -149,6 +151,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
+    private void setCurrentAddressAsyncTask() {
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+                while (Common.isNull(currentAddress)) {
+                    if (currentLocation!=null)
+                        currentAddress = Common.getGeoLocationName(getApplicationContext(),currentLocation.latitude,currentLocation.longitude);
+                }
+                return null;
+            }
+        };
+        task.execute((Void)null);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         markerButtonShare.setOnClickListener(markerButtonClickListener);
         markerButtonMove.setOnClickListener(markerButtonClickListener);
         statusBarMain = (TextView)findViewById(R.id.status_bar_main);
+        infoPanel = (TextView)findViewById(R.id.info_panel);
         progressBar = (View) findViewById(R.id.status_progress);
         params = getIntent().getExtras();
         contactListDetails = new HashMap<String,JSONObject>();
@@ -192,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         myLocationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentLocation!=null) {
+                if (currentLocation != null) {
                     moveToLocation(currentLocation);
                 }
             }
@@ -521,11 +538,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 e.printStackTrace();
                             }
                         }
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), Common.getGeoLocationName(getApplicationContext(),currentLocation.latitude,currentLocation.longitude)));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), currentAddress));
                         contactsLoaded=true;
                     } else if (status.equals(Constants.MESSAGE_SELECT_EMPTY)) {
                         //Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), getString(R.string.message_no_contacts));
-                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), Common.getGeoLocationName(getApplicationContext(),currentLocation.latitude,currentLocation.longitude)));
+                        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_welcome_user),userName,Common.convertDateToString(new Date(),Constants.DATE_FORMAT_WELCOME_MESSAGE),getString(R.string.app_name), currentAddress));
                     } else if (status.contains(Constants.STATUS_ERROR)) {
                         //ommon.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.error), Common.getErrorMessage(getApplicationContext(), status));
                         initializeContacts();
@@ -960,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             final String action = intent.getAction();
             if (data!=null) {
 
-                MainActivity mainActivityInstance = MainActivity.getInstance();
+                final MainActivity mainActivityInstance = MainActivity.getInstance();
                 if (action.equals(Constants.INTENT_DRAW_GPS)) {
 
                     latitude = Double.parseDouble((String) data.get(Constants.KEY_CURRENT_GPS_LATITUDE));
@@ -979,10 +996,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     if (mainActivityInstance.currentLocation == null && mainActivityInstance.googleMap != null) {
                                         mainActivityInstance.currentLocation = new LatLng(latitude, longitude);
                                         mainActivityInstance.moveCamera(mainActivityInstance.currentLocation);
+                                        mainActivityInstance.setCurrentAddressAsyncTask();
                                         mainActivityInstance.initializeMap();
                                     }
                                     if (mainActivityInstance.currentLocation!=null) {
                                         mainActivityInstance.redrawCurrentUserIcon(mainActivityInstance.currentLocation);
+                                        mainActivityInstance.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Common.updateInfoPanel(mainActivityInstance.infoPanel, R.color.message, String.format("[%1$s %2$s]\nETA: %3$s min(s) Speed: %4$s m/s",latitude,longitude,eta,speed));
+                                            }
+                                        });
                                     }
                                 }
                             } else mainActivityInstance.updateUserPosition(latitude, longitude, userCode, userName, speed, eta, timeStamp, targetLocation);
