@@ -423,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initializeMap() {
+        Common.setBitmapDescriptors();
         AsyncTask retrieveMarkersTask = new AsyncTask() {
             @Override
             protected void onPostExecute(Object jsonResponse) {

@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -40,6 +42,14 @@ import sp.ics.uplb.gtrack.R;
 import sp.ics.uplb.gtrack.services.FirebaseListenerService;
 
 public class Common {
+
+    public static BitmapDescriptor NORMAL_MARKER = null;
+    public static BitmapDescriptor TARGET_MARKER = null;
+
+    public static void setBitmapDescriptors() {
+        if (NORMAL_MARKER==null) NORMAL_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.marker);
+        if (TARGET_MARKER==null) TARGET_MARKER = BitmapDescriptorFactory.fromResource(R.drawable.target_marker);
+    }
 
     public static boolean isNull(String str) {
         if (str==null) return true;

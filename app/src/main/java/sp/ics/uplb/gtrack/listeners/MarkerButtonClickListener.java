@@ -228,7 +228,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
                                             }
                                             mainActivity.markerButtonSet.setText(isSet ? Constants.BUTTON_TEXT_UNSET : Constants.BUTTON_TEXT_SET);
-                                            selectedMarker.setIcon(BitmapDescriptorFactory.fromResource(isSet ? R.drawable.target_marker : R.drawable.marker));
+                                            selectedMarker.setIcon(isSet ? Common.TARGET_MARKER : Common.NORMAL_MARKER);
 
                                             if (mainActivity.mService!=null) {
                                                 if (isSet) mainActivity.mService.setTargetLocation(selectedMarker.getTitle(),selectedMarker.getPosition());
