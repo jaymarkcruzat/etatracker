@@ -119,7 +119,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
         intentGPS.putExtra(Constants.KEY_SENDER_USER_NAME, userName);
         intentGPS.putExtra(Constants.KEY_CURRENT_SPEED, String.valueOf(speed));
         intentGPS.putExtra(Constants.KEY_CURRENT_ETA, String.valueOf(eta));
-        intentGPS.putExtra(Constants.KEY_FBASE_SERVER_TIMESTAMP, Common.convertDateToString(Common.getCurrentTime()));
+        intentGPS.putExtra(Constants.KEY_FBASE_SERVER_TIMESTAMP, Common.convertDateToString(Common.getCurrentTime(),Constants.DATE_FORMAT_TIME_SENT_TO_FBASE));
         intentGPS.putExtra(Constants.KEY_TARGET_LOCATION, Constants.GLOBAL_BLANK);
         intentGPS.setAction(Constants.INTENT_DRAW_GPS);
         sendBroadcast(intentGPS);
@@ -143,7 +143,7 @@ public class FirebaseListenerService extends Service implements GoogleApiClient.
                                             .put(Constants.KEY_CURRENT_SPEED, speed)
                                             .put(Constants.KEY_CURRENT_ETA, eta)
                                             .put(Constants.KEY_SENDER_FIREBASEID, userFirebaseId)
-                                            .put(Constants.KEY_FBASE_SERVER_TIMESTAMP, Common.convertDateToString(Common.getCurrentTime()))
+                                            .put(Constants.KEY_FBASE_SERVER_TIMESTAMP, Common.convertDateToString(Common.getCurrentTime(),Constants.DATE_FORMAT_TIME_SENT_TO_FBASE))
                                             .put(Constants.KEY_TARGET_LOCATION,Constants.GLOBAL_BLANK).toString());
                             Logger.print("GPS Data Sent!");
                         } catch (JSONException e) {

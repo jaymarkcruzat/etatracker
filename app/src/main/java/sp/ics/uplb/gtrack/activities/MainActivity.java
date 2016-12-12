@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public HashMap<String,EditText> connectedUsersTextPanel= null;
     public HashMap<String,LinearLayout> horizontalViews= null;
     private HashMap<String,Marker> connectedUsersMarkers = null;
+    private HashMap<String,String> timeSentToFbase = null;
 
     private static MainActivity mainActivityRunningInstance;
     public static MainActivity getInstance() {
@@ -205,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         connectedUsersButtons = new HashMap<String,Button>();
         connectedUsersTextPanel = new HashMap<String,EditText>();
         horizontalViews = new HashMap<String,LinearLayout>();
+        timeSentToFbase = new HashMap<String,String>();
         myLocationView = (ImageView)findViewById(R.id.currentLocationButton);
         myLocationView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -579,7 +581,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         googleMap.setMyLocationEnabled(false);
-
+        googleMap.setBuildingsEnabled(true);
+        googleMap.setIndoorEnabled(true);
         googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(getLayoutInflater(), this));
         googleMap.setOnMarkerClickListener(new OnMarkerClickListener(this));
         googleMap.setOnInfoWindowCloseListener(new OnMarkerCloseListener(this));
@@ -753,7 +756,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }).setNegativeButton(Constants.GLOBAL_REJECT, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_meeting_request_rejected),sender));
+                Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_meeting_request_rejected), sender));
                 dialog.cancel();
             }
         });
@@ -815,7 +818,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             horizontalView.removeAllViews();
             if (parentLayout!=null) parentLayout.removeView(horizontalView);
         }
-        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_user_is_now_disconnected),userName));
+        Common.updateStatusBar(statusBarMain, ContextCompat.getColor(getApplicationContext(), R.color.message), String.format(getString(R.string.message_user_is_now_disconnected), userName));
     }
 
     private void sendDisconnectIntent(String userNameToBeDisconnected) {
@@ -829,6 +832,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra(Constants.TARGET_LOCATION, target);
         intent.putExtra(Constants.DISCONNECT, userNameToBeDisconnected);
         startService(intent);
+    }
+
+    public long getElapsedTimeInSeconds(String userName,String newTimeStamp) {
+        long elapsedTime =0;
+        Date newDateTime = Common.convertStringToDate(newTimeStamp,Constants.DATE_FORMAT_TIME_SENT_TO_FBASE);
+        String previousTimeValue = timeSentToFbase.get(userName);
+        Date previousTimeDate = Common.convertStringToDate(previousTimeValue,Constants.DATE_FORMAT_TIME_SENT_TO_FBASE);
+        elapsedTime = Common.getTimeDifferenceInSeconds(previousTimeDate,newDateTime);
+        return elapsedTime;
     }
 
     public void updateUserPanel(final String userName,int userCode, final double latitude, final double longitude, double speed, double eta, String timeStamp, String targetLocation) {
@@ -879,6 +891,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         EditText editText = connectedUsersTextPanel.containsKey(userName) ? connectedUsersTextPanel.get(userName) : null;
+        long elapsedTime = 0;
         if (editText==null) {
             editText = new EditText(this);
             editText.setCursorVisible(false);
@@ -893,10 +906,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             editText.setLayoutParams(layoutParams);
             connectedUsersTextPanel.put(userName,editText);
         }
-        editText.setText(userName + "→[ " + targetLocation + " ]" + Constants.GLOBAL_NEW_LINE +
-                "Speed: " + speed + " m/s ETA: " + eta + " min" + Constants.GLOBAL_NEW_LINE +
-                "Received: " + timeStamp);
+        else {
+            elapsedTime = getElapsedTimeInSeconds(userName,timeStamp);
+        }
+        String valueText = String.format("%1$s%2$s%3$s%4$s%5$s%6$s%7$s%8$s%9$s%10$s%11$s%12$s",userName,Constants.GLOBAL_NEW_LINE,"ETA: ",eta," min(s) ","Speed: ",speed," m/s ",Constants.GLOBAL_NEW_LINE,Constants.SENT,elapsedTime," secs ago.");
+        editText.setText(valueText);
         editText.invalidate();
+        timeSentToFbase.put(userName,timeStamp);
 
         LinearLayout horizontalView = horizontalViews.containsKey(userName) ? horizontalViews.get(userName) : null;
         if (horizontalView==null) {

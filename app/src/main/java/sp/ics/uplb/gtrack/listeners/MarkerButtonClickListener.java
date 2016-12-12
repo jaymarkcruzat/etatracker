@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -225,7 +224,7 @@ public class MarkerButtonClickListener implements Button.OnClickListener {
                                             while (i.hasNext()) {
                                                 Marker marker = (Marker) i.next();
                                                 if (!marker.equals(selectedMarker))
-                                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+                                                    marker.setIcon(Common.NORMAL_MARKER);
                                             }
                                             mainActivity.markerButtonSet.setText(isSet ? Constants.BUTTON_TEXT_UNSET : Constants.BUTTON_TEXT_SET);
                                             selectedMarker.setIcon(isSet ? Common.TARGET_MARKER : Common.NORMAL_MARKER);

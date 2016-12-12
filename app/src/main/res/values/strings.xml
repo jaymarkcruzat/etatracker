@@ -137,7 +137,7 @@
     <string name="prompt_set_marker">Do you want to start heading to this location?</string>
     <string name="prompt_stop_marker">Do you want to stop heading to this location?</string>
     <string name="prompt_share_marker">Share your marker to anyone in your contact list:</string>
-    <string name="prompt_accept_request">You were invited by %1$s to meet at location %2$s. Do you want to accept this request?"</string>
+    <string name="prompt_accept_request">You were invited by %1$s to meet at %2$s. Do you want to accept?"</string>
     <string name="prompt_title">Title</string>
     <string name="prompt_description">Description</string>
     <string name="prompt_enter_marker_details">Enter marker details:</string>

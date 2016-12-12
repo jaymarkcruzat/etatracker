@@ -34,6 +34,7 @@ public class Constants {
     public static final String FIREBASE_VALUE                               = "firebase_value";
     public static final String FIREBASE_VALUE_SEPARATOR                     = "/";
     public static final String SHARED_PREF                                  = "trackerapp";
+    public static final String SENT                                         = "Sent: ";
 
     public static final String USER_EMAIL                                   = "user_email";
     public static final String USER_NAME                                    = "user_name";
@@ -137,6 +138,7 @@ public class Constants {
     public static final String TABLE_NODE                                   = "node";
 
     public static final String DATE_FORMAT_WELCOME_MESSAGE                  = "EEEE, MMMM dd, yyyy";
+    public static final String DATE_FORMAT_TIME_SENT_TO_FBASE               = "dd-MM-yyyy HH:mm:ss";
 
     public static final String KEY_ID                                       = "id";
     public static final String KEY_NAME                                     = "name";

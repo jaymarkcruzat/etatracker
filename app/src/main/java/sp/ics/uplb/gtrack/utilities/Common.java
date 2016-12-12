@@ -260,13 +260,19 @@ public class Common {
         return simpleDateFormat.format(date);
     }
 
-    public static Date convertStringToDate(String strDate) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    public static Date convertStringToDate(String strDate,String format) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         try {
             return simpleDateFormat.parse(strDate);
         } catch (ParseException e) {
             return null;
         }
+    }
+
+    public static long getTimeDifferenceInSeconds(Date date1, Date date2) {
+        long diff = date2.getTime() - date1.getTime();
+        long diffSecs = diff / 1000 % 60;
+        return diffSecs;
     }
 
     public static Date getCurrentTime() {
